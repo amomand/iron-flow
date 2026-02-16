@@ -9,6 +9,7 @@ struct RestTimerView: View {
     @State private var remaining: Int
     @State private var timer: Timer?
     @State private var hasHapticFired = false
+    @State private var hasCompleted = false
 
     init(seconds: Int, exerciseName: String, onComplete: @escaping () -> Void, onSkip: @escaping () -> Void) {
         self.seconds = seconds
@@ -53,6 +54,8 @@ struct RestTimerView: View {
             Spacer()
 
             Button {
+                guard !hasCompleted else { return }
+                hasCompleted = true
                 stopTimer()
                 onSkip()
             } label: {
@@ -75,7 +78,8 @@ struct RestTimerView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if remaining > 0 {
                 remaining -= 1
-                if remaining == 0 {
+                if remaining == 0 && !hasCompleted {
+                    hasCompleted = true
                     fireHaptic()
                     stopTimer()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

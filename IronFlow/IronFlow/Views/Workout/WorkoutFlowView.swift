@@ -29,6 +29,7 @@ struct WorkoutFlowView: View {
                         session.advanceToNextStep()
                     }
                 )
+                .id(session.currentStepIndex)
             } else if let step = session.currentStep {
                 ExerciseCardView(
                     step: step,
