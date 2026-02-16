@@ -141,7 +141,7 @@ struct ExerciseCardView: View {
 
                 // Swipe hint
                 HStack(spacing: 4) {
-                    Text("swipe right to complete →")
+                    Text("← swipe left to complete")
                         .terminalFont(12)
                         .foregroundColor(TN.comment.opacity(0.5))
                 }
@@ -151,14 +151,14 @@ struct ExerciseCardView: View {
         .gesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .global)
                 .onChanged { value in
-                    if value.translation.width > 0 {
+                    if value.translation.width < 0 {
                         dragOffset = value.translation.width
                     }
                 }
                 .onEnded { value in
-                    if value.translation.width > swipeThreshold {
+                    if value.translation.width < -swipeThreshold {
                         withAnimation(.easeOut(duration: 0.2)) {
-                            dragOffset = UIScreen.main.bounds.width
+                            dragOffset = -UIScreen.main.bounds.width
                         }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             dragOffset = 0
