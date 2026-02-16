@@ -7,21 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E00001 /* IronFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10001; };
-		E00002 /* TokyoNightColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10002; };
-		E00003 /* TerminalStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10003; };
-		E00004 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10004; };
-		E00005 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10005; };
-		E00006 /* SetRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10006; };
-		E00007 /* RoutineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10007; };
-		E00008 /* RoutineListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10008; };
-		E00009 /* WorkoutFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10009; };
-		E00010 /* ExerciseCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10010; };
-		E00011 /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10011; };
-		E00012 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10012; };
-		E00013 /* RoutineEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10013; };
-		E00014 /* ExerciseEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10014; };
-		E00015 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E10015; };
+		E00001 /* IronFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10001 /* IronFlowApp.swift */; };
+		E00002 /* TokyoNightColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10002 /* TokyoNightColors.swift */; };
+		E00003 /* TerminalStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10003 /* TerminalStyle.swift */; };
+		E00004 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10004 /* Routine.swift */; };
+		E00005 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10005 /* WorkoutSession.swift */; };
+		E00006 /* SetRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10006 /* SetRating.swift */; };
+		E00007 /* RoutineStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10007 /* RoutineStore.swift */; };
+		E00008 /* RoutineListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10008 /* RoutineListView.swift */; };
+		E00009 /* WorkoutFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10009 /* WorkoutFlowView.swift */; };
+		E00010 /* ExerciseCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10010 /* ExerciseCardView.swift */; };
+		E00011 /* RestTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10011 /* RestTimerView.swift */; };
+		E00012 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10012 /* WorkoutSummaryView.swift */; };
+		E00013 /* RoutineEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10013 /* RoutineEditorView.swift */; };
+		E00014 /* ExerciseEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10014 /* ExerciseEditorView.swift */; };
+		E00015 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E10015 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,7 +54,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E20001 /* Root */ = {
+		E20001 = {
 			isa = PBXGroup;
 			children = (
 				E20002 /* IronFlow */,
@@ -353,7 +353,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = B4YXM5RCS4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = IronFlow;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -383,7 +383,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = B4YXM5RCS4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = IronFlow;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
