@@ -4,18 +4,15 @@ struct RestTimerView: View {
     let seconds: Int
     let exerciseName: String
     let onComplete: () -> Void
-    let onSkip: () -> Void
 
     @State private var remaining: Int
     @State private var timer: Timer?
-    @State private var hasHapticFired = false
     @State private var hasCompleted = false
 
-    init(seconds: Int, exerciseName: String, onComplete: @escaping () -> Void, onSkip: @escaping () -> Void) {
+    init(seconds: Int, exerciseName: String, onComplete: @escaping () -> Void) {
         self.seconds = seconds
         self.exerciseName = exerciseName
         self.onComplete = onComplete
-        self.onSkip = onSkip
         self._remaining = State(initialValue: seconds)
     }
 
@@ -57,7 +54,8 @@ struct RestTimerView: View {
                 guard !hasCompleted else { return }
                 hasCompleted = true
                 stopTimer()
-                onSkip()
+                fireHaptic()
+                onComplete()
             } label: {
                 Text("[ SKIP ▸ ]")
             }
@@ -82,9 +80,7 @@ struct RestTimerView: View {
                     hasCompleted = true
                     fireHaptic()
                     stopTimer()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        onComplete()
-                    }
+                    onComplete()
                 }
             }
         }
@@ -96,14 +92,7 @@ struct RestTimerView: View {
     }
 
     private func fireHaptic() {
-        guard !hasHapticFired else { return }
-        hasHapticFired = true
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
-        // Fire a second burst after a short delay for emphasis
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            let impact = UIImpactFeedbackGenerator(style: .heavy)
-            impact.impactOccurred()
-        }
     }
 }

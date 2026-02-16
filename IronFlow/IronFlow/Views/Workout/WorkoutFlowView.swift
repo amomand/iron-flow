@@ -24,9 +24,6 @@ struct WorkoutFlowView: View {
                     exerciseName: step.exercise.name,
                     onComplete: {
                         session.advanceToNextStep()
-                    },
-                    onSkip: {
-                        session.advanceToNextStep()
                     }
                 )
                 .id(session.currentStepIndex)
