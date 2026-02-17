@@ -24,9 +24,10 @@ struct RoutineListView: View {
                         Button {
                             showingImport = true
                         } label: {
-                            Text("[ ↓ IMPORT ]")
+                            Image(systemName: "square.and.arrow.down")
+                                .font(.system(size: 16, weight: .bold, design: .monospaced))
+                                .foregroundColor(TN.purple)
                         }
-                        .buttonStyle(TerminalButtonStyle(color: TN.purple))
                         Button {
                             showingNewRoutine = true
                         } label: {
