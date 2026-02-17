@@ -28,8 +28,9 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
     var id: UUID
     var name: String
     var sets: Int
-    var reps: String
-    var restSeconds: Int
+    var reps: Int
+    var restBetweenSetsSeconds: Int
+    var restAfterExerciseSeconds: Int
     var notes: String
     var perSide: Bool
 
@@ -37,8 +38,9 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
         id: UUID = UUID(),
         name: String,
         sets: Int = 3,
-        reps: String = "10",
-        restSeconds: Int = 60,
+        reps: Int = 10,
+        restBetweenSetsSeconds: Int = 60,
+        restAfterExerciseSeconds: Int = 90,
         notes: String = "",
         perSide: Bool = false
     ) {
@@ -46,9 +48,59 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
         self.name = name
         self.sets = sets
         self.reps = reps
-        self.restSeconds = restSeconds
+        self.restBetweenSetsSeconds = restBetweenSetsSeconds
+        self.restAfterExerciseSeconds = restAfterExerciseSeconds
         self.notes = notes
         self.perSide = perSide
+    }
+
+    // Backward-compatible decoding: handles old string reps and single restSeconds
+    enum CodingKeys: String, CodingKey {
+        case id, name, sets, reps, restBetweenSetsSeconds, restAfterExerciseSeconds, notes, perSide
+        case restSeconds // legacy key
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        sets = try c.decode(Int.self, forKey: .sets)
+        notes = try c.decode(String.self, forKey: .notes)
+        perSide = try c.decode(Bool.self, forKey: .perSide)
+
+        // Reps: try Int first, fall back to String (take lower bound of range)
+        if let intReps = try? c.decode(Int.self, forKey: .reps) {
+            reps = intReps
+        } else if let strReps = try? c.decode(String.self, forKey: .reps) {
+            let digits = strReps.prefix(while: { $0.isNumber })
+            reps = Int(digits) ?? 10
+        } else {
+            reps = 10
+        }
+
+        // Rest: try new split fields first, fall back to legacy single field
+        if let between = try? c.decode(Int.self, forKey: .restBetweenSetsSeconds) {
+            restBetweenSetsSeconds = between
+            restAfterExerciseSeconds = try c.decodeIfPresent(Int.self, forKey: .restAfterExerciseSeconds) ?? min(between + 30, 180)
+        } else if let legacy = try? c.decode(Int.self, forKey: .restSeconds) {
+            restBetweenSetsSeconds = legacy
+            restAfterExerciseSeconds = legacy == 0 ? 0 : min(legacy + 30, 180)
+        } else {
+            restBetweenSetsSeconds = 60
+            restAfterExerciseSeconds = 90
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encode(name, forKey: .name)
+        try c.encode(sets, forKey: .sets)
+        try c.encode(reps, forKey: .reps)
+        try c.encode(restBetweenSetsSeconds, forKey: .restBetweenSetsSeconds)
+        try c.encode(restAfterExerciseSeconds, forKey: .restAfterExerciseSeconds)
+        try c.encode(notes, forKey: .notes)
+        try c.encode(perSide, forKey: .perSide)
     }
 }
 
@@ -59,6 +111,11 @@ struct WorkoutStep: Identifiable {
     let exercise: ExerciseBlock
     let setNumber: Int
     let isFirstInSection: Bool
+    let isLastSetOfExercise: Bool
+
+    var restSeconds: Int {
+        isLastSetOfExercise ? exercise.restAfterExerciseSeconds : exercise.restBetweenSetsSeconds
+    }
 }
 
 extension Routine {
@@ -71,7 +128,8 @@ extension Routine {
                         sectionName: section.name,
                         exercise: exercise,
                         setNumber: setNum,
-                        isFirstInSection: exerciseIndex == 0 && setNum == 1
+                        isFirstInSection: exerciseIndex == 0 && setNum == 1,
+                        isLastSetOfExercise: setNum == exercise.sets
                     ))
                 }
             }

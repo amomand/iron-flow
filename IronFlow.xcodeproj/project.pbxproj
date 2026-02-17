@@ -21,6 +21,7 @@
 		E00012 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10012 /* WorkoutSummaryView.swift */; };
 		E00013 /* RoutineEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10013 /* RoutineEditorView.swift */; };
 		E00014 /* ExerciseEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10014 /* ExerciseEditorView.swift */; };
+		E00016 /* RoutineOverviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10016 /* RoutineOverviewSheet.swift */; };
 		E00015 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E10015 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +40,7 @@
 		E10012 /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
 		E10013 /* RoutineEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineEditorView.swift; sourceTree = "<group>"; };
 		E10014 /* ExerciseEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseEditorView.swift; sourceTree = "<group>"; };
+		E10016 /* RoutineOverviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineOverviewSheet.swift; sourceTree = "<group>"; };
 		E10015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E10099 /* IronFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IronFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -119,6 +121,7 @@
 				E10010 /* ExerciseCardView.swift */,
 				E10011 /* RestTimerView.swift */,
 				E10012 /* WorkoutSummaryView.swift */,
+				E10016 /* RoutineOverviewSheet.swift */,
 			);
 			path = Workout;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 				E00012 /* WorkoutSummaryView.swift in Sources */,
 				E00013 /* RoutineEditorView.swift in Sources */,
 				E00014 /* ExerciseEditorView.swift in Sources */,
+				E00016 /* RoutineOverviewSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

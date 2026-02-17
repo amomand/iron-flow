@@ -18,6 +18,14 @@ struct SetResult: Identifiable, Codable {
     }
 }
 
+struct RoutineAdjustment: Identifiable {
+    let id = UUID()
+    let exerciseName: String
+    let field: String          // "reps" or "sets"
+    let oldValue: Int
+    let newValue: Int
+}
+
 @Observable
 class WorkoutSession {
     let routine: Routine
@@ -28,15 +36,31 @@ class WorkoutSession {
     var isResting: Bool = false
     var isFinished: Bool = false
     let startedAt: Date
+    var adjustments: [RoutineAdjustment] = []
 
     var currentStep: WorkoutStep? {
         guard currentStepIndex < steps.count else { return nil }
         return steps[currentStepIndex]
     }
 
+    var nextStep: WorkoutStep? {
+        let nextIndex = currentStepIndex + 1
+        guard nextIndex < steps.count else { return nil }
+        return steps[nextIndex]
+    }
+
     var progress: Double {
         guard !steps.isEmpty else { return 1.0 }
         return Double(currentStepIndex) / Double(steps.count)
+    }
+
+    var estimatedMinutesRemaining: Int {
+        guard currentStepIndex < steps.count else { return 0 }
+        let remaining = steps[currentStepIndex..<steps.count]
+        let totalSeconds = remaining.reduce(0) { total, step in
+            total + 30 + step.restSeconds  // ~30s per active set + rest
+        }
+        return max(1, (totalSeconds + 30) / 60)  // round up
     }
 
     init(routine: Routine) {
@@ -55,7 +79,7 @@ class WorkoutSession {
         )
         results.append(result)
 
-        if step.exercise.restSeconds > 0 && currentStepIndex < steps.count - 1 {
+        if step.restSeconds > 0 && currentStepIndex < steps.count - 1 {
             isResting = true
         } else {
             advanceToNextStep()
@@ -68,6 +92,84 @@ class WorkoutSession {
         currentStepIndex += 1
         if currentStepIndex >= steps.count {
             isFinished = true
+            adjustments = computeAdjustments()
+        }
+    }
+
+    // MARK: - Adjustment Engine
+
+    func computeAdjustments() -> [RoutineAdjustment] {
+        var adj: [RoutineAdjustment] = []
+
+        // Group results by exercise ID
+        let grouped = Dictionary(grouping: results) { $0.exerciseId }
+
+        for section in routine.sections {
+            for exercise in section.exercises {
+                guard exercise.sets > 1 else { continue }  // skip single-set (warm-ups)
+                guard let exerciseResults = grouped[exercise.id], !exerciseResults.isEmpty else { continue }
+
+                let total = exerciseResults.count
+                let fails = exerciseResults.filter { $0.rating == .couldNotComplete }.count
+                let easies = exerciseResults.filter { $0.rating == .tooEasy }.count
+
+                let failRatio = Double(fails) / Double(total)
+                let easyRatio = Double(easies) / Double(total)
+
+                if failRatio >= 0.5 {
+                    // Too hard: reduce reps first, then sets
+                    if exercise.reps > 5 {
+                        let drop = failRatio >= 0.75 ? 2 : 1
+                        let newReps = max(5, exercise.reps - drop)
+                        if newReps != exercise.reps {
+                            adj.append(RoutineAdjustment(
+                                exerciseName: exercise.name, field: "reps",
+                                oldValue: exercise.reps, newValue: newReps
+                            ))
+                        }
+                    } else if exercise.sets > 2 {
+                        adj.append(RoutineAdjustment(
+                            exerciseName: exercise.name, field: "sets",
+                            oldValue: exercise.sets, newValue: exercise.sets - 1
+                        ))
+                    }
+                } else if easyRatio >= 0.75 {
+                    // Too easy: increase reps first, then sets
+                    if exercise.reps < 20 {
+                        let bump = easyRatio >= 1.0 ? 2 : 1
+                        let newReps = min(20, exercise.reps + bump)
+                        if newReps != exercise.reps {
+                            adj.append(RoutineAdjustment(
+                                exerciseName: exercise.name, field: "reps",
+                                oldValue: exercise.reps, newValue: newReps
+                            ))
+                        }
+                    } else if exercise.sets < 6 {
+                        adj.append(RoutineAdjustment(
+                            exerciseName: exercise.name, field: "sets",
+                            oldValue: exercise.sets, newValue: exercise.sets + 1
+                        ))
+                    }
+                }
+            }
+        }
+
+        return adj
+    }
+
+    func applyAdjustments(to routine: inout Routine) {
+        for adjustment in adjustments {
+            for si in routine.sections.indices {
+                for ei in routine.sections[si].exercises.indices {
+                    if routine.sections[si].exercises[ei].name == adjustment.exerciseName {
+                        if adjustment.field == "reps" {
+                            routine.sections[si].exercises[ei].reps = adjustment.newValue
+                        } else if adjustment.field == "sets" {
+                            routine.sections[si].exercises[ei].sets = adjustment.newValue
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -82,7 +184,7 @@ class WorkoutSession {
         let fails = results.filter { $0.rating == .couldNotComplete }
         let easies = results.filter { $0.rating == .tooEasy }
 
-        if fails.isEmpty && easies.isEmpty {
+        if fails.isEmpty && easies.isEmpty && adjustments.isEmpty {
             md += "All sets completed as expected. No adjustments needed.\n"
             return md
         }
@@ -98,7 +200,7 @@ class WorkoutSession {
         }
 
         if !easies.isEmpty {
-            md += "### 🔥 Too Easy (Consider Progressing)\n"
+            md += "### 🪶 Too Easy (Consider Progressing)\n"
             let grouped = Dictionary(grouping: easies) { $0.exerciseName }
             for (name, sets) in grouped.sorted(by: { $0.key < $1.key }) {
                 let totalSetsForExercise = results.filter { $0.exerciseName == name }.count
@@ -108,6 +210,14 @@ class WorkoutSession {
                     let setNums = sets.map { "Set \($0.setNumber)" }.joined(separator: ", ")
                     md += "- **\(name)** — \(setNums): Too easy\n"
                 }
+            }
+            md += "\n"
+        }
+
+        if !adjustments.isEmpty {
+            md += "### 📐 Adjustments Applied\n"
+            for a in adjustments {
+                md += "- **\(a.exerciseName)** — \(a.field): \(a.oldValue) → \(a.newValue)\n"
             }
         }
 

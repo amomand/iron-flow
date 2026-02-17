@@ -62,40 +62,77 @@ struct ExerciseEditorView: View {
                             Text("REPS")
                                 .terminalFont(11)
                                 .foregroundColor(TN.comment)
-                            TextField("e.g. 8-10", text: $exercise.reps)
-                                .terminalFont(16)
-                                .foregroundColor(TN.fg)
-                                .textFieldStyle(.plain)
-                                .padding(8)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .fill(TN.darkCard)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 4)
-                                                .stroke(TN.comment.opacity(0.3), lineWidth: 1)
-                                        )
-                                )
+                            HStack(spacing: 12) {
+                                Button {
+                                    if exercise.reps > 1 { exercise.reps -= 1 }
+                                } label: {
+                                    Text("−")
+                                        .terminalFont(18, weight: .bold)
+                                        .foregroundColor(TN.red)
+                                        .frame(width: 36, height: 36)
+                                        .background(TN.darkCard)
+                                        .cornerRadius(4)
+                                }
+                                Text("\(exercise.reps)")
+                                    .terminalFont(22, weight: .bold)
+                                    .foregroundColor(TN.fg)
+                                    .frame(minWidth: 30)
+                                Button {
+                                    exercise.reps += 1
+                                } label: {
+                                    Text("+")
+                                        .terminalFont(18, weight: .bold)
+                                        .foregroundColor(TN.green)
+                                        .frame(width: 36, height: 36)
+                                        .background(TN.darkCard)
+                                        .cornerRadius(4)
+                                }
+                            }
                         }
                     }
 
-                    // Rest
+                    // Rest between sets
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("REST (SECONDS)")
+                        Text("REST BETWEEN SETS (SEC)")
                             .terminalFont(11)
                             .foregroundColor(TN.comment)
 
                         HStack(spacing: 8) {
                             ForEach([0, 15, 30, 45, 60, 90, 120], id: \.self) { sec in
                                 Button {
-                                    exercise.restSeconds = sec
+                                    exercise.restBetweenSetsSeconds = sec
                                 } label: {
                                     Text(sec == 0 ? "—" : "\(sec)")
                                         .terminalFont(13, weight: .bold)
-                                        .foregroundColor(exercise.restSeconds == sec ? TN.bg : TN.fg)
+                                        .foregroundColor(exercise.restBetweenSetsSeconds == sec ? TN.bg : TN.fg)
                                         .frame(minWidth: 36, minHeight: 36)
                                         .background(
                                             RoundedRectangle(cornerRadius: 4)
-                                                .fill(exercise.restSeconds == sec ? TN.blue : TN.darkCard)
+                                                .fill(exercise.restBetweenSetsSeconds == sec ? TN.blue : TN.darkCard)
+                                        )
+                                }
+                            }
+                        }
+                    }
+
+                    // Rest after exercise
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("REST AFTER EXERCISE (SEC)")
+                            .terminalFont(11)
+                            .foregroundColor(TN.comment)
+
+                        HStack(spacing: 8) {
+                            ForEach([0, 15, 30, 45, 60, 90, 120], id: \.self) { sec in
+                                Button {
+                                    exercise.restAfterExerciseSeconds = sec
+                                } label: {
+                                    Text(sec == 0 ? "—" : "\(sec)")
+                                        .terminalFont(13, weight: .bold)
+                                        .foregroundColor(exercise.restAfterExerciseSeconds == sec ? TN.bg : TN.fg)
+                                        .frame(minWidth: 36, minHeight: 36)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 4)
+                                                .fill(exercise.restAfterExerciseSeconds == sec ? TN.blue : TN.darkCard)
                                         )
                                 }
                             }

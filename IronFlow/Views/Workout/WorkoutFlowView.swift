@@ -2,12 +2,15 @@ import SwiftUI
 
 struct WorkoutFlowView: View {
     let routine: Routine
+    let store: RoutineStore
     let onDismiss: () -> Void
     @State private var session: WorkoutSession
     @State private var showQuitConfirm = false
+    @State private var showOverview = false
 
-    init(routine: Routine, onDismiss: @escaping () -> Void) {
+    init(routine: Routine, store: RoutineStore, onDismiss: @escaping () -> Void) {
         self.routine = routine
+        self.store = store
         self.onDismiss = onDismiss
         self._session = State(initialValue: WorkoutSession(routine: routine))
     }
@@ -17,14 +20,16 @@ struct WorkoutFlowView: View {
             TN.bg.ignoresSafeArea()
 
             if session.isFinished {
-                WorkoutSummaryView(session: session, onDone: onDismiss)
+                WorkoutSummaryView(session: session, store: store, onDone: onDismiss)
             } else if session.isResting, let step = session.currentStep {
                 RestTimerView(
-                    seconds: step.exercise.restSeconds,
-                    exerciseName: step.exercise.name,
+                    seconds: step.restSeconds,
+                    nextExerciseName: session.nextStep?.exercise.name ?? "done!",
+                    estimatedMinutes: session.estimatedMinutesRemaining,
                     onComplete: {
                         session.advanceToNextStep()
-                    }
+                    },
+                    onShowOverview: { showOverview = true }
                 )
                 .id(session.currentStepIndex)
             } else if let step = session.currentStep {
@@ -32,13 +37,15 @@ struct WorkoutFlowView: View {
                     step: step,
                     totalSteps: session.steps.count,
                     currentIndex: session.currentStepIndex,
+                    estimatedMinutes: session.estimatedMinutesRemaining,
                     selectedRating: $session.selectedRating,
                     onComplete: {
                         session.completeCurrentSet()
                     },
                     onQuit: {
                         showQuitConfirm = true
-                    }
+                    },
+                    onShowOverview: { showOverview = true }
                 )
             }
         }
@@ -53,6 +60,9 @@ struct WorkoutFlowView: View {
             Button("Quit", role: .destructive) { onDismiss() }
         } message: {
             Text("Progress will be lost.")
+        }
+        .sheet(isPresented: $showOverview) {
+            RoutineOverviewSheet(session: session)
         }
     }
 }

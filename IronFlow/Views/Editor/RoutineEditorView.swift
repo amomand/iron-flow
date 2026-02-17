@@ -176,8 +176,8 @@ struct ExerciseEditorRow: View {
                     Text("\(exercise.sets)×\(exercise.reps)")
                         .terminalFont(12)
                         .foregroundColor(TN.blue)
-                    if exercise.restSeconds > 0 {
-                        Text("rest \(exercise.restSeconds)s")
+                    if exercise.restBetweenSetsSeconds > 0 {
+                        Text("rest \(exercise.restBetweenSetsSeconds)s/\(exercise.restAfterExerciseSeconds)s")
                             .terminalFont(12)
                             .foregroundColor(TN.comment)
                     }

@@ -2,9 +2,11 @@ import SwiftUI
 
 struct WorkoutSummaryView: View {
     let session: WorkoutSession
+    let store: RoutineStore
     let onDone: () -> Void
 
     @State private var copied = false
+    @State private var adjustmentsApplied = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,7 +36,7 @@ struct WorkoutSummaryView: View {
                     let fails = session.results.filter { $0.rating == .couldNotComplete }
                     let easies = session.results.filter { $0.rating == .tooEasy }
 
-                    if fails.isEmpty && easies.isEmpty {
+                    if fails.isEmpty && easies.isEmpty && session.adjustments.isEmpty {
                         HStack {
                             Spacer()
                             VStack(spacing: 8) {
@@ -76,7 +78,7 @@ struct WorkoutSummaryView: View {
                                     .padding(.vertical, 4)
                             }
 
-                            Text("🔥 TOO EASY — CONSIDER PROGRESSING")
+                            Text("🪶 TOO EASY — CONSIDER PROGRESSING")
                                 .terminalFont(14, weight: .bold)
                                 .foregroundColor(TN.yellow)
 
@@ -90,6 +92,32 @@ struct WorkoutSummaryView: View {
                                         color: TN.yellow
                                     )
                                 }
+                            }
+                        }
+
+                        if !session.adjustments.isEmpty {
+                            Divider()
+                                .background(TN.comment.opacity(0.3))
+                                .padding(.vertical, 4)
+
+                            Text("📐 ADJUSTMENTS APPLIED")
+                                .terminalFont(14, weight: .bold)
+                                .foregroundColor(TN.blue)
+
+                            ForEach(session.adjustments) { adj in
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(adj.exerciseName)
+                                            .terminalFont(14, weight: .bold)
+                                            .foregroundColor(TN.fg)
+                                        Text("\(adj.field): \(adj.oldValue) → \(adj.newValue)")
+                                            .terminalFont(12)
+                                            .foregroundColor(TN.blue)
+                                    }
+                                    Spacer()
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .terminalCard()
                             }
                         }
                     }
@@ -120,6 +148,14 @@ struct WorkoutSummaryView: View {
                 .buttonStyle(TerminalButtonStyle(color: TN.comment))
             }
             .padding(.bottom, 32)
+        }
+        .onAppear {
+            if !adjustmentsApplied && !session.adjustments.isEmpty {
+                adjustmentsApplied = true
+                var updated = session.routine
+                session.applyAdjustments(to: &updated)
+                store.updateRoutine(updated)
+            }
         }
     }
 

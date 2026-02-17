@@ -64,7 +64,7 @@ struct RoutineListView: View {
             }
             .navigationBarHidden(true)
             .fullScreenCover(item: $selectedRoutine) { routine in
-                WorkoutFlowView(routine: routine) {
+                WorkoutFlowView(routine: routine, store: store) {
                     selectedRoutine = nil
                 }
             }

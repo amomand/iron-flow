@@ -4,9 +4,11 @@ struct ExerciseCardView: View {
     let step: WorkoutStep
     let totalSteps: Int
     let currentIndex: Int
+    let estimatedMinutes: Int
     @Binding var selectedRating: SetRating
     let onComplete: () -> Void
     let onQuit: () -> Void
+    let onShowOverview: () -> Void
 
     @State private var dragOffset: CGFloat = 0
 
@@ -31,9 +33,25 @@ struct ExerciseCardView: View {
 
                     Spacer()
 
-                    Text("\(currentIndex + 1)/\(totalSteps)")
-                        .terminalFont(13)
+                    Text("~\(estimatedMinutes) min left")
+                        .terminalFont(12)
                         .foregroundColor(TN.comment)
+
+                    Spacer()
+
+                    HStack(spacing: 12) {
+                        Button {
+                            onShowOverview()
+                        } label: {
+                            Image(systemName: "list.bullet")
+                                .foregroundColor(TN.comment)
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        }
+
+                        Text("\(currentIndex + 1)/\(totalSteps)")
+                            .terminalFont(13)
+                            .foregroundColor(TN.comment)
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -88,7 +106,7 @@ struct ExerciseCardView: View {
                             Text("REPS")
                                 .terminalFont(11)
                                 .foregroundColor(TN.comment)
-                            Text(step.exercise.reps)
+                            Text("\(step.exercise.reps)")
                                 .terminalFont(18, weight: .bold)
                                 .foregroundColor(TN.green)
                         }

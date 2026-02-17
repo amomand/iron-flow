@@ -2,22 +2,44 @@ import SwiftUI
 
 struct RestTimerView: View {
     let seconds: Int
-    let exerciseName: String
+    let nextExerciseName: String
+    let estimatedMinutes: Int
     let onComplete: () -> Void
+    let onShowOverview: () -> Void
 
     @State private var remaining: Int
     @State private var timer: Timer?
     @State private var hasCompleted = false
 
-    init(seconds: Int, exerciseName: String, onComplete: @escaping () -> Void) {
+    init(seconds: Int, nextExerciseName: String, estimatedMinutes: Int, onComplete: @escaping () -> Void, onShowOverview: @escaping () -> Void) {
         self.seconds = seconds
-        self.exerciseName = exerciseName
+        self.nextExerciseName = nextExerciseName
+        self.estimatedMinutes = estimatedMinutes
         self.onComplete = onComplete
+        self.onShowOverview = onShowOverview
         self._remaining = State(initialValue: seconds)
     }
 
     var body: some View {
         VStack(spacing: 32) {
+            // Top bar with overview button and time remaining
+            HStack {
+                Spacer()
+                Text("~\(estimatedMinutes) min left")
+                    .terminalFont(12)
+                    .foregroundColor(TN.comment)
+                Spacer()
+                Button {
+                    onShowOverview()
+                } label: {
+                    Image(systemName: "list.bullet")
+                        .foregroundColor(TN.comment)
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                }
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+
             Spacer()
 
             Text("// REST")
@@ -44,7 +66,7 @@ struct RestTimerView: View {
                     .animation(.linear(duration: 1), value: remaining)
             }
 
-            Text("after: \(exerciseName)")
+            Text("next: \(nextExerciseName)")
                 .terminalFont(13)
                 .foregroundColor(TN.comment)
 

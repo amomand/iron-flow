@@ -17,7 +17,7 @@ enum SetRating: String, Codable, CaseIterable {
         switch self {
         case .couldNotComplete: return "❌"
         case .good: return "✅"
-        case .tooEasy: return "🔥"
+        case .tooEasy: return "🪶"
         }
     }
 }
