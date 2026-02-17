@@ -53,6 +53,47 @@ class RoutineStore {
         save()
     }
 
+    func exportRoutineJSON(_ routine: Routine) -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(routine) else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    func importRoutineFromJSON(_ json: String) -> Result<Routine, ImportError> {
+        guard let data = json.data(using: .utf8) else {
+            return .failure(.invalidJSON)
+        }
+        do {
+            var routine = try JSONDecoder().decode(Routine.self, from: data)
+            // Assign new IDs so imports never collide with existing routines
+            routine.id = UUID()
+            for si in routine.sections.indices {
+                routine.sections[si].id = UUID()
+                for ei in routine.sections[si].exercises.indices {
+                    routine.sections[si].exercises[ei].id = UUID()
+                }
+            }
+            routines.append(routine)
+            save()
+            return .success(routine)
+        } catch {
+            return .failure(.decodingFailed(error.localizedDescription))
+        }
+    }
+
+    enum ImportError: LocalizedError {
+        case invalidJSON
+        case decodingFailed(String)
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidJSON: return "Clipboard does not contain valid text."
+            case .decodingFailed(let msg): return "Could not parse routine: \(msg)"
+            }
+        }
+    }
+
     // MARK: - Seed Data
 
     static func seedRoutines() -> [Routine] {
