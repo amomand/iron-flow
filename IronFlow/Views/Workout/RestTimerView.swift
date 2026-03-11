@@ -10,6 +10,7 @@ struct RestTimerView: View {
     @State private var remaining: Int
     @State private var timer: Timer?
     @State private var hasCompleted = false
+    @State private var endTime: Date = .now
 
     init(seconds: Int, nextExerciseName: String, estimatedMinutes: Int, onComplete: @escaping () -> Void, onShowOverview: @escaping () -> Void) {
         self.seconds = seconds
@@ -95,15 +96,17 @@ struct RestTimerView: View {
     }
 
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if remaining > 0 {
-                remaining -= 1
-                if remaining == 0 && !hasCompleted {
-                    hasCompleted = true
-                    fireHaptic()
-                    stopTimer()
-                    onComplete()
-                }
+        endTime = Date().addingTimeInterval(Double(seconds))
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            let rem = Int(endTime.timeIntervalSinceNow.rounded(.up))
+            if rem > 0 {
+                remaining = rem
+            } else if !hasCompleted {
+                remaining = 0
+                hasCompleted = true
+                fireHaptic()
+                stopTimer()
+                onComplete()
             }
         }
     }
