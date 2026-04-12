@@ -173,7 +173,7 @@ struct ExerciseEditorRow: View {
                     .terminalFont(14, weight: .bold)
                     .foregroundColor(TN.fg)
                 HStack(spacing: 8) {
-                    Text("\(exercise.sets)×\(exercise.reps)")
+                    Text(exercise.isTimed ? "\(exercise.sets)×\(exercise.workDisplayValue)s" : "\(exercise.sets)×\(exercise.reps)")
                         .terminalFont(12)
                         .foregroundColor(TN.blue)
                     if exercise.restBetweenSetsSeconds > 0 {

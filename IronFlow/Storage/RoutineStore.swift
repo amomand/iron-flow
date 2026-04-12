@@ -97,51 +97,74 @@ class RoutineStore {
     // MARK: - Seed Data
 
     static func seedRoutines() -> [Routine] {
-        [sessionA(), sessionB()]
+        [sessionA(), sessionB(), sessionC(), sessionD()]
     }
 
     private static func sessionA() -> Routine {
-        Routine(name: "Session A: Horizontal Push / Row Focus", sections: [
-            Section(name: "Warm-up", exercises: [
-                ExerciseBlock(name: "Arm circles", sets: 1, reps: 10, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: "Each direction"),
-                ExerciseBlock(name: "Kettlebell halos (14kg)", sets: 1, reps: 8, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: "Each direction"),
-                ExerciseBlock(name: "Scapular push-ups", sets: 1, reps: 10, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: ""),
-                ExerciseBlock(name: "Shoulder dislocates / band pull-aparts", sets: 1, reps: 10, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: ""),
+        Routine(name: "Upper A — Push and Row", sections: [
+            Section(name: "Main Lifts", exercises: [
+                ExerciseBlock(name: "Floor press KB (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Two handed grip on the kettlebell."),
+                ExerciseBlock(name: "Single-arm KB row (24kg)", sets: 3, reps: 8, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Brace hard, pull elbow to hip, squeeze at top.", perSide: true),
             ]),
-            Section(name: "Strength Block", exercises: [
-                ExerciseBlock(name: "Chair dips", sets: 4, reps: 8, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Tempo: 3 sec down, pause, explode up. Progress by adding 10kg dumbbell in lap."),
-                ExerciseBlock(name: "Single-arm KB row (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Brace hard, pull elbow to hip, squeeze at top.", perSide: true),
+            Section(name: "Volume Work", exercises: [
+                ExerciseBlock(name: "Push-ups", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Full range, no collapsed hips, no rushing."),
+                ExerciseBlock(name: "Standing single-arm KB press (14kg)", sets: 3, reps: 6, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Brace core, strict press.", perSide: true),
+                ExerciseBlock(name: "Dumbbell lateral raises (10kg)", sets: 2, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Use partial range with strict control. Stop before traps take over. If form breaks, the set is done."),
             ]),
-            Section(name: "Hypertrophy Block", exercises: [
-                ExerciseBlock(name: "Incline press-ups (feet elevated)", sets: 3, reps: 12, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Slow eccentric to 4 sec if too easy."),
-                ExerciseBlock(name: "KB floor press (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Single arm, opposite leg bent for stability.", perSide: true),
-                ExerciseBlock(name: "Hammer curls (10kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 45, restAfterExerciseSeconds: 75, notes: "Standing, controlled, no swing."),
-            ]),
-            Section(name: "Core Finisher", exercises: [
-                ExerciseBlock(name: "Dead bugs", sets: 3, reps: 8, restBetweenSetsSeconds: 15, restAfterExerciseSeconds: 15, notes: "", perSide: true),
-                ExerciseBlock(name: "Hollow body hold", sets: 2, reps: 20, restBetweenSetsSeconds: 15, restAfterExerciseSeconds: 15, notes: "Seconds hold"),
+            Section(name: "Core", exercises: [
+                ExerciseBlock(name: "Sit-ups", sets: 2, reps: 10, restBetweenSetsSeconds: 30, restAfterExerciseSeconds: 30, notes: ""),
             ]),
         ])
     }
 
     private static func sessionB() -> Routine {
-        Routine(name: "Session B: Overhead / Vertical Focus", sections: [
-            Section(name: "Warm-up", exercises: [
-                ExerciseBlock(name: "Stretch", sets: 1, reps: 1, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: ""),
-                ExerciseBlock(name: "Kettlebell halos (14kg)", sets: 2, reps: 8, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: "Each direction"),
-                ExerciseBlock(name: "Cat-cow", sets: 1, reps: 10, restBetweenSetsSeconds: 0, restAfterExerciseSeconds: 0, notes: ""),
+        Routine(name: "Lower A — Squat and Hinge", sections: [
+            Section(name: "Main Lifts", exercises: [
+                ExerciseBlock(name: "Goblet squats (24kg)", sets: 3, reps: 6, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Slow eccentric so the 24kg keeps biting."),
+                ExerciseBlock(name: "Romanian deadlifts (24kg KB)", sets: 3, reps: 8, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Hips back, soft knees, flat back, controlled stretch."),
             ]),
-            Section(name: "Strength Block", exercises: [
-                ExerciseBlock(name: "Pike press-ups", sets: 4, reps: 8, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Feet on chair for difficulty. Head touches floor between hands. Handstand push-up progression."),
-                ExerciseBlock(name: "KB high pull (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Explosive hip hinge, elbows high and wide. Not an upright row."),
+            Section(name: "Volume Work", exercises: [
+                ExerciseBlock(name: "Bulgarian split squats (10kg dumbbells)", sets: 3, reps: 6, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Rear foot on chair. Control the descent.", perSide: true),
+                ExerciseBlock(name: "Kettlebell swings (14kg)", sets: 3, reps: 12, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Clean hinge power, not flailing survival."),
+                ExerciseBlock(name: "Standing calf raises (24kg)", sets: 3, reps: 12, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Hold KB and work the full range."),
             ]),
-            Section(name: "Hypertrophy Block", exercises: [
-                ExerciseBlock(name: "Single-arm KB press (14kg or 24kg)", sets: 3, reps: 8, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Standing, brace core, strict press.", perSide: true),
-                ExerciseBlock(name: "Archer press-ups", sets: 3, reps: 6, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Wide base, shift weight to working arm. One-arm push-up progression.", perSide: true),
-                ExerciseBlock(name: "KB curl (14kg, two-handed on horns)", sets: 3, reps: 12, restBetweenSetsSeconds: 45, restAfterExerciseSeconds: 75, notes: "Or single-arm with 10kg dumbbell."),
+            Section(name: "Core", exercises: [
+                ExerciseBlock(name: "Front plank", sets: 2, reps: 30, durationSeconds: 30, restBetweenSetsSeconds: 30, restAfterExerciseSeconds: 30, notes: "Seconds hold."),
             ]),
-            Section(name: "Core Finisher", exercises: [
-                ExerciseBlock(name: "Turkish get-up (14kg)", sets: 2, reps: 1, restBetweenSetsSeconds: 120, restAfterExerciseSeconds: 120, notes: "Worth the price of admission alone. Take your time.", perSide: true),
+        ])
+    }
+
+    private static func sessionC() -> Routine {
+        Routine(name: "Upper B — Shoulder and Pull", sections: [
+            Section(name: "Main Lifts", exercises: [
+                ExerciseBlock(name: "Single-arm KB row (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Rows appear twice per week — without pull-ups you need the pulling volume.", perSide: true),
+                ExerciseBlock(name: "Standing single-arm KB press (14kg)", sets: 3, reps: 6, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Brace core, strict press.", perSide: true),
+            ]),
+            Section(name: "Volume Work", exercises: [
+                ExerciseBlock(name: "Chair dips or close-grip push-ups", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Choose dips only if shoulders feel good and setup is stable. Otherwise, close-grip push-ups are the safer default."),
+                ExerciseBlock(name: "Hammer curls (10kg dumbbells)", sets: 3, reps: 8, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Standing, controlled, no swing."),
+                ExerciseBlock(name: "Rear delt raise (10kg dumbbells)", sets: 2, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Prioritise control over textbook purity. Use bent-over high row with strict pause if needed."),
+            ]),
+            Section(name: "Core", exercises: [
+                ExerciseBlock(name: "Leg raises", sets: 2, reps: 10, restBetweenSetsSeconds: 30, restAfterExerciseSeconds: 30, notes: ""),
+            ]),
+        ])
+    }
+
+    private static func sessionD() -> Routine {
+        Routine(name: "Lower B — Unilateral and Posterior Chain", sections: [
+            Section(name: "Strength", exercises: [
+                ExerciseBlock(name: "Reverse lunges (10kg dumbbells)", sets: 3, reps: 8, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Unilateral work keeps the load effective even without massive weight.", perSide: true),
+                ExerciseBlock(name: "Goblet squats (24kg)", sets: 3, reps: 10, restBetweenSetsSeconds: 90, restAfterExerciseSeconds: 120, notes: "Higher reps than Lower A — volume day."),
+                ExerciseBlock(name: "Single-leg Romanian deadlifts (14kg KB)", sets: 3, reps: 8, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Balance and posterior chain.", perSide: true),
+            ]),
+            Section(name: "Conditioning", exercises: [
+                ExerciseBlock(name: "Kettlebell swings (24kg)", sets: 3, reps: 15, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Clean hinge power."),
+                ExerciseBlock(name: "Glute bridge (24kg across hips)", sets: 3, reps: 10, restBetweenSetsSeconds: 60, restAfterExerciseSeconds: 90, notes: "Extra posterior-chain work without smashing your lower back after swings."),
+            ]),
+            Section(name: "Core", exercises: [
+                ExerciseBlock(name: "Sit-ups", sets: 2, reps: 10, restBetweenSetsSeconds: 30, restAfterExerciseSeconds: 30, notes: ""),
+                ExerciseBlock(name: "Leg raises", sets: 2, reps: 8, restBetweenSetsSeconds: 30, restAfterExerciseSeconds: 30, notes: ""),
             ]),
         ])
     }

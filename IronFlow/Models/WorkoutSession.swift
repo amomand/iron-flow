@@ -8,14 +8,26 @@ struct SetResult: Identifiable, Codable {
     let rating: SetRating
     let completedAt: Date
 
-    init(exerciseId: UUID, exerciseName: String, setNumber: Int, rating: SetRating) {
+    init(exerciseId: UUID, exerciseName: String, setNumber: Int, rating: SetRating, completedAt: Date = Date()) {
         self.id = UUID()
         self.exerciseId = exerciseId
         self.exerciseName = exerciseName
         self.setNumber = setNumber
         self.rating = rating
-        self.completedAt = Date()
+        self.completedAt = completedAt
     }
+}
+
+enum WorkoutTimerKind {
+    case exercise
+    case rest
+}
+
+struct WorkoutTimer {
+    let kind: WorkoutTimerKind
+    let durationSeconds: Int
+    let startedAt: Date
+    let endsAt: Date
 }
 
 struct RoutineAdjustment: Identifiable {
@@ -33,10 +45,10 @@ class WorkoutSession {
     var currentStepIndex: Int = 0
     var selectedRating: SetRating = .good
     var results: [SetResult] = []
-    var isResting: Bool = false
     var isFinished: Bool = false
     let startedAt: Date
     var adjustments: [RoutineAdjustment] = []
+    var activeTimer: WorkoutTimer?
 
     var currentStep: WorkoutStep? {
         guard currentStepIndex < steps.count else { return nil }
@@ -54,45 +66,126 @@ class WorkoutSession {
         return Double(currentStepIndex) / Double(steps.count)
     }
 
+    var isResting: Bool {
+        activeTimer?.kind == .rest
+    }
+
+    var isTimedExerciseActive: Bool {
+        activeTimer?.kind == .exercise
+    }
+
+    var currentTimerDurationSeconds: Int {
+        activeTimer?.durationSeconds ?? 0
+    }
+
     var estimatedMinutesRemaining: Int {
         guard currentStepIndex < steps.count else { return 0 }
-        let remaining = steps[currentStepIndex..<steps.count]
-        let totalSeconds = remaining.reduce(0) { total, step in
-            total + 30 + step.restSeconds  // ~30s per active set + rest
+
+        var totalSeconds = 0
+
+        if let currentStep {
+            if isResting {
+                totalSeconds += remainingTimerSeconds()
+            } else if isTimedExerciseActive {
+                totalSeconds += remainingTimerSeconds()
+                if currentStep.restSeconds > 0 && currentStepIndex < steps.count - 1 {
+                    totalSeconds += currentStep.restSeconds
+                }
+            } else {
+                totalSeconds += currentStep.workSeconds
+                if currentStep.restSeconds > 0 && currentStepIndex < steps.count - 1 {
+                    totalSeconds += currentStep.restSeconds
+                }
+            }
         }
-        return max(1, (totalSeconds + 30) / 60)  // round up
+
+        if currentStepIndex + 1 < steps.count {
+            for index in (currentStepIndex + 1)..<steps.count {
+                let step = steps[index]
+                totalSeconds += step.workSeconds
+                if step.restSeconds > 0 && index < steps.count - 1 {
+                    totalSeconds += step.restSeconds
+                }
+            }
+        }
+
+        return max(1, (totalSeconds + 30) / 60)
     }
 
     init(routine: Routine) {
         self.routine = routine
         self.steps = routine.buildSteps()
         self.startedAt = Date()
+        configureCurrentStage(startingAt: startedAt)
     }
 
-    func completeCurrentSet() {
+    func remainingTimerSeconds(at date: Date = .now) -> Int {
+        guard let activeTimer else { return 0 }
+        let remainingInterval = activeTimer.endsAt.timeIntervalSince(date)
+        return min(activeTimer.durationSeconds, max(0, Int(remainingInterval.rounded(.up))))
+    }
+
+    func completeCurrentSet(completedAt: Date = .now) {
         guard let step = currentStep else { return }
+
+        activeTimer = nil
         let result = SetResult(
             exerciseId: step.exercise.id,
             exerciseName: step.exercise.name,
             setNumber: step.setNumber,
-            rating: selectedRating
+            rating: selectedRating,
+            completedAt: completedAt
         )
         results.append(result)
 
         if step.restSeconds > 0 && currentStepIndex < steps.count - 1 {
-            isResting = true
+            startTimer(kind: .rest, durationSeconds: step.restSeconds, startingAt: completedAt)
         } else {
-            advanceToNextStep()
+            advanceToNextStep(startingAt: completedAt)
         }
     }
 
-    func advanceToNextStep() {
-        isResting = false
+    func skipActiveTimer(at date: Date = .now) {
+        guard let activeTimer else { return }
+
+        switch activeTimer.kind {
+        case .exercise:
+            completeCurrentSet(completedAt: date)
+        case .rest:
+            self.activeTimer = nil
+            advanceToNextStep(startingAt: date)
+        }
+    }
+
+    @discardableResult
+    func refreshAgainstClock(now: Date = .now) -> Bool {
+        guard !isFinished else { return false }
+
+        var completedTimer = false
+
+        while let activeTimer, activeTimer.endsAt <= now {
+            completedTimer = true
+            switch activeTimer.kind {
+            case .exercise:
+                completeCurrentSet(completedAt: activeTimer.endsAt)
+            case .rest:
+                self.activeTimer = nil
+                advanceToNextStep(startingAt: activeTimer.endsAt)
+            }
+        }
+
+        return completedTimer
+    }
+
+    func advanceToNextStep(startingAt date: Date = .now) {
+        activeTimer = nil
         selectedRating = .good
         currentStepIndex += 1
         if currentStepIndex >= steps.count {
             isFinished = true
             adjustments = computeAdjustments()
+        } else {
+            configureCurrentStage(startingAt: date)
         }
     }
 
@@ -222,5 +315,20 @@ class WorkoutSession {
         }
 
         return md
+    }
+
+    private func configureCurrentStage(startingAt date: Date) {
+        guard let step = currentStep else { return }
+        guard let durationSeconds = step.exercise.durationSeconds, durationSeconds > 0 else { return }
+        startTimer(kind: .exercise, durationSeconds: durationSeconds, startingAt: date)
+    }
+
+    private func startTimer(kind: WorkoutTimerKind, durationSeconds: Int, startingAt date: Date) {
+        activeTimer = WorkoutTimer(
+            kind: kind,
+            durationSeconds: durationSeconds,
+            startedAt: date,
+            endsAt: date.addingTimeInterval(Double(durationSeconds))
+        )
     }
 }

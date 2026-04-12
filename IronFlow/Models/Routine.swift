@@ -29,6 +29,7 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
     var name: String
     var sets: Int
     var reps: Int
+    var durationSeconds: Int?
     var restBetweenSetsSeconds: Int
     var restAfterExerciseSeconds: Int
     var notes: String
@@ -39,6 +40,7 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
         name: String,
         sets: Int = 3,
         reps: Int = 10,
+        durationSeconds: Int? = nil,
         restBetweenSetsSeconds: Int = 60,
         restAfterExerciseSeconds: Int = 90,
         notes: String = "",
@@ -48,6 +50,7 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
         self.name = name
         self.sets = sets
         self.reps = reps
+        self.durationSeconds = durationSeconds
         self.restBetweenSetsSeconds = restBetweenSetsSeconds
         self.restAfterExerciseSeconds = restAfterExerciseSeconds
         self.notes = notes
@@ -56,7 +59,7 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
 
     // Backward-compatible decoding: handles old string reps and single restSeconds
     enum CodingKeys: String, CodingKey {
-        case id, name, sets, reps, restBetweenSetsSeconds, restAfterExerciseSeconds, notes, perSide
+        case id, name, sets, reps, durationSeconds, restBetweenSetsSeconds, restAfterExerciseSeconds, notes, perSide
         case restSeconds // legacy key
     }
 
@@ -78,6 +81,9 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
             reps = 10
         }
 
+        durationSeconds = try c.decodeIfPresent(Int.self, forKey: .durationSeconds)
+            ?? Self.legacyDurationSeconds(from: notes, reps: reps)
+
         // Rest: try new split fields first, fall back to legacy single field
         if let between = try? c.decode(Int.self, forKey: .restBetweenSetsSeconds) {
             restBetweenSetsSeconds = between
@@ -97,10 +103,27 @@ struct ExerciseBlock: Identifiable, Codable, Equatable {
         try c.encode(name, forKey: .name)
         try c.encode(sets, forKey: .sets)
         try c.encode(reps, forKey: .reps)
+        try c.encodeIfPresent(durationSeconds, forKey: .durationSeconds)
         try c.encode(restBetweenSetsSeconds, forKey: .restBetweenSetsSeconds)
         try c.encode(restAfterExerciseSeconds, forKey: .restAfterExerciseSeconds)
         try c.encode(notes, forKey: .notes)
         try c.encode(perSide, forKey: .perSide)
+    }
+
+    var isTimed: Bool {
+        workDisplayValue > 0 && durationSeconds != nil
+    }
+
+    var workDisplayValue: Int {
+        durationSeconds ?? reps
+    }
+
+    private static func legacyDurationSeconds(from notes: String, reps: Int) -> Int? {
+        let normalizedNotes = notes.lowercased()
+        guard reps > 0 else { return nil }
+        guard normalizedNotes.contains("hold") else { return nil }
+        guard normalizedNotes.contains("sec") || normalizedNotes.contains("second") else { return nil }
+        return reps
     }
 }
 
@@ -115,6 +138,10 @@ struct WorkoutStep: Identifiable {
 
     var restSeconds: Int {
         isLastSetOfExercise ? exercise.restAfterExerciseSeconds : exercise.restBetweenSetsSeconds
+    }
+
+    var workSeconds: Int {
+        exercise.durationSeconds ?? 30
     }
 }
 

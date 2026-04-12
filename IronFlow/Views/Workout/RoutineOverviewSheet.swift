@@ -97,7 +97,7 @@ struct OverviewStepRow: View {
                     Text("Set \(step.setNumber)/\(step.exercise.sets)")
                         .terminalFont(11)
                         .foregroundColor(isCompleted ? TN.comment.opacity(0.3) : TN.comment)
-                    Text("× \(step.exercise.reps) reps")
+                    Text(step.exercise.isTimed ? "⏱ \(step.exercise.workDisplayValue)s" : "× \(step.exercise.reps) reps")
                         .terminalFont(11)
                         .foregroundColor(isCompleted ? TN.comment.opacity(0.3) : TN.comment)
                     if step.exercise.perSide {

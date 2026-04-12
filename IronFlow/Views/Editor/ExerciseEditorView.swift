@@ -59,12 +59,12 @@ struct ExerciseEditorView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("REPS")
+                            Text(exercise.isTimed ? "TIME (SEC)" : "REPS")
                                 .terminalFont(11)
                                 .foregroundColor(TN.comment)
                             HStack(spacing: 12) {
                                 Button {
-                                    if exercise.reps > 1 { exercise.reps -= 1 }
+                                    decrementWorkValue()
                                 } label: {
                                     Text("−")
                                         .terminalFont(18, weight: .bold)
@@ -73,12 +73,12 @@ struct ExerciseEditorView: View {
                                         .background(TN.darkCard)
                                         .cornerRadius(4)
                                 }
-                                Text("\(exercise.reps)")
+                                Text("\(exercise.workDisplayValue)")
                                     .terminalFont(22, weight: .bold)
                                     .foregroundColor(TN.fg)
                                     .frame(minWidth: 30)
                                 Button {
-                                    exercise.reps += 1
+                                    incrementWorkValue()
                                 } label: {
                                     Text("+")
                                         .terminalFont(18, weight: .bold)
@@ -90,6 +90,13 @@ struct ExerciseEditorView: View {
                             }
                         }
                     }
+
+                    Toggle(isOn: timedBinding) {
+                        Text("Timed exercise")
+                            .terminalFont(14)
+                            .foregroundColor(TN.fg)
+                    }
+                    .tint(TN.blue)
 
                     // Rest between sets
                     VStack(alignment: .leading, spacing: 4) {
@@ -210,6 +217,37 @@ struct ExerciseEditorView: View {
                                 .stroke(TN.comment.opacity(0.3), lineWidth: 1)
                         )
                 )
+        }
+    }
+
+    private var timedBinding: Binding<Bool> {
+        Binding(
+            get: { exercise.isTimed },
+            set: { isTimed in
+                if isTimed {
+                    exercise.durationSeconds = exercise.durationSeconds ?? max(exercise.reps, 30)
+                } else {
+                    exercise.durationSeconds = nil
+                }
+            }
+        )
+    }
+
+    private func decrementWorkValue() {
+        if exercise.isTimed {
+            let currentDuration = exercise.durationSeconds ?? max(exercise.reps, 30)
+            exercise.durationSeconds = max(5, currentDuration - 5)
+        } else if exercise.reps > 1 {
+            exercise.reps -= 1
+        }
+    }
+
+    private func incrementWorkValue() {
+        if exercise.isTimed {
+            let currentDuration = exercise.durationSeconds ?? max(exercise.reps, 30)
+            exercise.durationSeconds = currentDuration + 5
+        } else {
+            exercise.reps += 1
         }
     }
 }
