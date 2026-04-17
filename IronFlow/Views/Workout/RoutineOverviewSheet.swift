@@ -15,6 +15,7 @@ struct RoutineOverviewSheet: View {
                         .terminalFont(14, weight: .bold)
                         .foregroundColor(TN.purple)
                     Spacer()
+                    PhaseChip(phase: session.routine.currentPhase)
                     Button {
                         dismiss()
                     } label: {
@@ -59,6 +60,22 @@ struct RoutineOverviewSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+    }
+}
+
+struct PhaseChip: View {
+    let phase: WorkoutPhase
+
+    var body: some View {
+        Text(phase.displayName.uppercased())
+            .terminalFont(10, weight: .bold)
+            .foregroundColor(TN.bg)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(phase.accentColor)
+            )
     }
 }
 

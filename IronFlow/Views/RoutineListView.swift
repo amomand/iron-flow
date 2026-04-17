@@ -51,10 +51,18 @@ struct RoutineListView: View {
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(store.routines) { routine in
-                                RoutineRow(routine: routine)
+                                RoutineRow(
+                                    routine: routine,
+                                    onSelectPhase: { phase in
+                                        var updated = routine
+                                        updated.currentPhase = phase
+                                        store.updateRoutine(updated)
+                                    }
+                                )
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        selectedRoutine = routine
+                                        // Use the latest stored version so currentPhase is fresh.
+                                        selectedRoutine = store.routines.first(where: { $0.id == routine.id }) ?? routine
                                     }
                                     .contextMenu {
                                         Button("Edit") {
@@ -125,25 +133,69 @@ struct RoutineListView: View {
 
 struct RoutineRow: View {
     let routine: Routine
+    let onSelectPhase: (WorkoutPhase) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(routine.name)
                 .terminalFont(16, weight: .bold)
                 .foregroundColor(TN.fg)
 
             HStack(spacing: 16) {
                 let exerciseCount = routine.sections.flatMap(\.exercises).count
-                let setCount = routine.sections.flatMap(\.exercises).map(\.sets).reduce(0, +)
+                let resolved = routine.sections
+                    .flatMap(\.exercises)
+                    .map { $0.resolved(for: routine.currentPhase) }
+                let setCount = resolved.map(\.sets).reduce(0, +)
                 Label("\(routine.sections.count) blocks", systemImage: "list.bullet")
                 Label("\(exerciseCount) exercises", systemImage: "figure.strengthtraining.traditional")
                 Label("\(setCount) sets", systemImage: "repeat")
             }
             .terminalFont(12)
             .foregroundColor(TN.comment)
+
+            PhasePicker(current: routine.currentPhase, onSelect: onSelectPhase)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .terminalCard()
+    }
+}
+
+struct PhasePicker: View {
+    let current: WorkoutPhase
+    let onSelect: (WorkoutPhase) -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(WorkoutPhase.allCases, id: \.self) { phase in
+                Button {
+                    if phase != current { onSelect(phase) }
+                } label: {
+                    Text(phase.displayName.uppercased())
+                        .terminalFont(11, weight: .bold)
+                        .foregroundColor(phase == current ? TN.bg : TN.comment)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(phase == current ? phase.accentColor : TN.darkCard)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+
+extension WorkoutPhase {
+    /// Accent color used in pickers and phase indicators.
+    /// Final phase-wide theming arrives in Phase 3.
+    var accentColor: Color {
+        switch self {
+        case .base: return TN.blue
+        case .peak: return TN.red
+        case .deload: return TN.green
+        }
     }
 }
 

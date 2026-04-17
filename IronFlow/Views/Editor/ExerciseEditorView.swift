@@ -154,6 +154,9 @@ struct ExerciseEditorView: View {
                     }
                     .tint(TN.blue)
 
+                    // Phase variants (Peak / Deload overrides)
+                    PhaseVariantsSection(exercise: $exercise)
+
                     // Notes
                     VStack(alignment: .leading, spacing: 4) {
                         Text("NOTES")
@@ -248,6 +251,178 @@ struct ExerciseEditorView: View {
             exercise.durationSeconds = currentDuration + 5
         } else {
             exercise.reps += 1
+        }
+    }
+}
+
+// MARK: - Phase Variants
+
+struct PhaseVariantsSection: View {
+    @Binding var exercise: ExerciseBlock
+    @State private var isExpanded: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.15)) { isExpanded.toggle() }
+            } label: {
+                HStack {
+                    Text("PHASE VARIANTS")
+                        .terminalFont(11, weight: .bold)
+                        .foregroundColor(TN.comment)
+                    Text(summaryText)
+                        .terminalFont(11)
+                        .foregroundColor(TN.comment.opacity(0.7))
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundColor(TN.comment)
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                PhaseOverrideEditor(phase: .peak, exercise: $exercise)
+                PhaseOverrideEditor(phase: .deload, exercise: $exercise)
+            }
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 4)
+                .fill(TN.darkCard.opacity(0.5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(TN.comment.opacity(0.2), lineWidth: 1)
+                )
+        )
+    }
+
+    private var summaryText: String {
+        let active = [WorkoutPhase.peak, .deload].filter { !(exercise.phaseOverrides[$0]?.isEmpty ?? true) }
+        if active.isEmpty { return "same as base" }
+        return active.map(\.displayName).joined(separator: " · ")
+    }
+}
+
+struct PhaseOverrideEditor: View {
+    let phase: WorkoutPhase
+    @Binding var exercise: ExerciseBlock
+
+    private var override: PhaseOverride {
+        exercise.phaseOverrides[phase] ?? PhaseOverride()
+    }
+
+    private func update(_ mutate: (inout PhaseOverride) -> Void) {
+        var o = override
+        mutate(&o)
+        if o.isEmpty {
+            exercise.phaseOverrides.removeValue(forKey: phase)
+        } else {
+            exercise.phaseOverrides[phase] = o
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Text(phase.displayName.uppercased())
+                    .terminalFont(11, weight: .bold)
+                    .foregroundColor(TN.bg)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        RoundedRectangle(cornerRadius: 3).fill(phase.accentColor)
+                    )
+                Spacer()
+                if !override.isEmpty {
+                    Button {
+                        exercise.phaseOverrides.removeValue(forKey: phase)
+                    } label: {
+                        Text("[ RESET ]")
+                            .terminalFont(10, weight: .bold)
+                            .foregroundColor(TN.comment)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+
+            HStack(spacing: 16) {
+                overrideStepper(
+                    label: "SETS",
+                    value: override.sets,
+                    baseValue: exercise.sets,
+                    minValue: 1,
+                    step: 1,
+                    onChange: { newValue in update { $0.sets = newValue } }
+                )
+                overrideStepper(
+                    label: exercise.isTimed ? "TIME" : "REPS",
+                    value: exercise.isTimed ? override.durationSeconds : override.reps,
+                    baseValue: exercise.workDisplayValue,
+                    minValue: exercise.isTimed ? 5 : 1,
+                    step: exercise.isTimed ? 5 : 1,
+                    onChange: { newValue in
+                        update {
+                            if exercise.isTimed {
+                                $0.durationSeconds = newValue
+                            } else {
+                                $0.reps = newValue
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        .padding(.top, 4)
+    }
+
+    @ViewBuilder
+    private func overrideStepper(
+        label: String,
+        value: Int?,
+        baseValue: Int,
+        minValue: Int,
+        step: Int,
+        onChange: @escaping (Int?) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .terminalFont(10)
+                .foregroundColor(TN.comment)
+            HStack(spacing: 8) {
+                Button {
+                    let current = value ?? baseValue
+                    let next = max(minValue, current - step)
+                    onChange(next == baseValue ? nil : next)
+                } label: {
+                    Text("−")
+                        .terminalFont(14, weight: .bold)
+                        .foregroundColor(TN.red)
+                        .frame(width: 28, height: 28)
+                        .background(TN.darkCard)
+                        .cornerRadius(4)
+                }
+                .buttonStyle(.plain)
+
+                Text(value.map(String.init) ?? "— \(baseValue)")
+                    .terminalFont(14, weight: value == nil ? .regular : .bold)
+                    .foregroundColor(value == nil ? TN.comment : TN.fg)
+                    .frame(minWidth: 44)
+
+                Button {
+                    let current = value ?? baseValue
+                    let next = current + step
+                    onChange(next == baseValue ? nil : next)
+                } label: {
+                    Text("+")
+                        .terminalFont(14, weight: .bold)
+                        .foregroundColor(TN.green)
+                        .frame(width: 28, height: 28)
+                        .background(TN.darkCard)
+                        .cornerRadius(4)
+                }
+                .buttonStyle(.plain)
+            }
         }
     }
 }
