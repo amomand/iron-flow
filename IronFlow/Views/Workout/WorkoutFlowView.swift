@@ -20,9 +20,13 @@ struct WorkoutFlowView: View {
         self._session = State(initialValue: WorkoutSession(routine: routine))
     }
 
+    private var theme: Theme {
+        Theme.for(routine.currentPhase)
+    }
+
     var body: some View {
         ZStack {
-            TN.bg.ignoresSafeArea()
+            theme.bg.ignoresSafeArea()
 
             if session.isFinished {
                 WorkoutSummaryView(session: session, store: store, onDone: onDismiss)
@@ -102,7 +106,9 @@ struct WorkoutFlowView: View {
         }
         .sheet(isPresented: $showOverview) {
             RoutineOverviewSheet(session: session)
+                .environment(\.theme, theme)
         }
+        .environment(\.theme, theme)
     }
 
     private func syncSession(to date: Date, triggerVibration: Bool) {
