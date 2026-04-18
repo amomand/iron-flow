@@ -10,6 +10,7 @@
 		E00001 /* IronFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10001 /* IronFlowApp.swift */; };
 		E00002 /* TokyoNightColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10002 /* TokyoNightColors.swift */; };
 		E00003 /* TerminalStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10003 /* TerminalStyle.swift */; };
+		E00020 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10020 /* Theme.swift */; };
 		E00004 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10004 /* Routine.swift */; };
 		E00005 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10005 /* WorkoutSession.swift */; };
 		E00006 /* SetRating.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10006 /* SetRating.swift */; };
@@ -29,6 +30,7 @@
 		E10001 /* IronFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IronFlowApp.swift; sourceTree = "<group>"; };
 		E10002 /* TokyoNightColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokyoNightColors.swift; sourceTree = "<group>"; };
 		E10003 /* TerminalStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalStyle.swift; sourceTree = "<group>"; };
+		E10020 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		E10004 /* Routine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Routine.swift; sourceTree = "<group>"; };
 		E10005 /* WorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSession.swift; sourceTree = "<group>"; };
 		E10006 /* SetRating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRating.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			children = (
 				E10002 /* TokyoNightColors.swift */,
 				E10003 /* TerminalStyle.swift */,
+				E10020 /* Theme.swift */,
 			);
 			path = Theme;
 			sourceTree = "<group>";
@@ -215,6 +218,7 @@
 				E00001 /* IronFlowApp.swift in Sources */,
 				E00002 /* TokyoNightColors.swift in Sources */,
 				E00003 /* TerminalStyle.swift in Sources */,
+				E00020 /* Theme.swift in Sources */,
 				E00004 /* Routine.swift in Sources */,
 				E00005 /* WorkoutSession.swift in Sources */,
 				E00006 /* SetRating.swift in Sources */,

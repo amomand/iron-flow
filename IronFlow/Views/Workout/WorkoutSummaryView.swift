@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WorkoutSummaryView: View {
+    @Environment(\.theme) private var theme
     let session: WorkoutSession
     let store: RoutineStore
     let onDone: () -> Void
@@ -13,22 +14,22 @@ struct WorkoutSummaryView: View {
             // Header
             Text("// WORKOUT COMPLETE")
                 .terminalFont(18, weight: .bold)
-                .foregroundColor(TN.green)
+                .foregroundColor(theme.green)
                 .padding(.top, 24)
 
             Text(session.routine.name)
                 .terminalFont(13)
-                .foregroundColor(TN.comment)
+                .foregroundColor(theme.comment)
                 .padding(.top, 4)
 
             let duration = formattedDuration
             Text("Duration: \(duration)")
                 .terminalFont(13)
-                .foregroundColor(TN.comment)
+                .foregroundColor(theme.comment)
                 .padding(.top, 2)
 
             Divider()
-                .background(TN.comment.opacity(0.3))
+                .background(theme.comment.opacity(0.3))
                 .padding(.vertical, 16)
 
             ScrollView {
@@ -44,10 +45,10 @@ struct WorkoutSummaryView: View {
                                     .font(.system(size: 40))
                                 Text("All sets completed as expected")
                                     .terminalFont(14)
-                                    .foregroundColor(TN.green)
+                                    .foregroundColor(theme.green)
                                 Text("No adjustments needed.")
                                     .terminalFont(12)
-                                    .foregroundColor(TN.comment)
+                                    .foregroundColor(theme.comment)
                             }
                             Spacer()
                         }
@@ -56,7 +57,7 @@ struct WorkoutSummaryView: View {
                         if !fails.isEmpty {
                             Text("❌ NEEDS ATTENTION")
                                 .terminalFont(14, weight: .bold)
-                                .foregroundColor(TN.red)
+                                .foregroundColor(theme.red)
 
                             let grouped = Dictionary(grouping: fails) { $0.exerciseName }
                             ForEach(grouped.keys.sorted(), id: \.self) { name in
@@ -65,7 +66,7 @@ struct WorkoutSummaryView: View {
                                         name: name,
                                         sets: sets,
                                         totalSets: session.results.filter { $0.exerciseName == name }.count,
-                                        color: TN.red
+                                        color: theme.red
                                     )
                                 }
                             }
@@ -74,13 +75,13 @@ struct WorkoutSummaryView: View {
                         if !easies.isEmpty {
                             if !fails.isEmpty {
                                 Divider()
-                                    .background(TN.comment.opacity(0.3))
+                                    .background(theme.comment.opacity(0.3))
                                     .padding(.vertical, 4)
                             }
 
                             Text("🪶 TOO EASY — CONSIDER PROGRESSING")
                                 .terminalFont(14, weight: .bold)
-                                .foregroundColor(TN.yellow)
+                                .foregroundColor(theme.yellow)
 
                             let grouped = Dictionary(grouping: easies) { $0.exerciseName }
                             ForEach(grouped.keys.sorted(), id: \.self) { name in
@@ -89,7 +90,7 @@ struct WorkoutSummaryView: View {
                                         name: name,
                                         sets: sets,
                                         totalSets: session.results.filter { $0.exerciseName == name }.count,
-                                        color: TN.yellow
+                                        color: theme.yellow
                                     )
                                 }
                             }
@@ -97,22 +98,22 @@ struct WorkoutSummaryView: View {
 
                         if !session.adjustments.isEmpty {
                             Divider()
-                                .background(TN.comment.opacity(0.3))
+                                .background(theme.comment.opacity(0.3))
                                 .padding(.vertical, 4)
 
                             Text("📐 ADJUSTMENTS APPLIED")
                                 .terminalFont(14, weight: .bold)
-                                .foregroundColor(TN.blue)
+                                .foregroundColor(theme.blue)
 
                             ForEach(session.adjustments) { adj in
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(adj.exerciseName)
                                             .terminalFont(14, weight: .bold)
-                                            .foregroundColor(TN.fg)
+                                            .foregroundColor(theme.fg)
                                         Text("\(adj.field): \(adj.oldValue) → \(adj.newValue)")
                                             .terminalFont(12)
-                                            .foregroundColor(TN.blue)
+                                            .foregroundColor(theme.blue)
                                     }
                                     Spacer()
                                 }
@@ -138,14 +139,14 @@ struct WorkoutSummaryView: View {
                 } label: {
                     Text(copied ? "[ ✓ COPIED ]" : "[ COPY SUMMARY ]")
                 }
-                .buttonStyle(TerminalButtonStyle(color: copied ? TN.green : TN.blue))
+                .buttonStyle(TerminalButtonStyle(color: copied ? theme.green : theme.blue))
 
                 Button {
                     onDone()
                 } label: {
                     Text("[ DONE ]")
                 }
-                .buttonStyle(TerminalButtonStyle(color: TN.comment))
+                .buttonStyle(TerminalButtonStyle(color: theme.comment))
             }
             .padding(.bottom, 32)
         }
@@ -168,6 +169,7 @@ struct WorkoutSummaryView: View {
 }
 
 struct SummaryExerciseRow: View {
+    @Environment(\.theme) private var theme
     let name: String
     let sets: [SetResult]
     let totalSets: Int
@@ -177,7 +179,7 @@ struct SummaryExerciseRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(name)
                 .terminalFont(14, weight: .bold)
-                .foregroundColor(TN.fg)
+                .foregroundColor(theme.fg)
 
             if sets.count == totalSets {
                 Text("All sets")

@@ -10,6 +10,7 @@ struct ExerciseCardView: View {
     let onQuit: () -> Void
     let onShowOverview: () -> Void
 
+    @Environment(\.theme) private var theme
     @State private var dragOffset: CGFloat = 0
 
     private let swipeThreshold: CGFloat = 80
@@ -28,14 +29,14 @@ struct ExerciseCardView: View {
                     } label: {
                         Text("[ ✕ ]")
                             .terminalFont(14, weight: .bold)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                     }
 
                     Spacer()
 
                     Text("~\(estimatedMinutes) min left")
                         .terminalFont(12)
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
 
                     Spacer()
 
@@ -44,13 +45,13 @@ struct ExerciseCardView: View {
                             onShowOverview()
                         } label: {
                             Image(systemName: "list.bullet")
-                                .foregroundColor(TN.comment)
+                                .foregroundColor(theme.comment)
                                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                         }
 
                         Text("\(currentIndex + 1)/\(totalSteps)")
                             .terminalFont(13)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                     }
                 }
                 .padding(.horizontal)
@@ -60,10 +61,10 @@ struct ExerciseCardView: View {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .fill(TN.darkCard)
+                            .fill(theme.darkCard)
                             .frame(height: 3)
                         Rectangle()
-                            .fill(TN.blue)
+                            .fill(theme.blue)
                             .frame(width: geo.size.width * Double(currentIndex) / Double(max(totalSteps, 1)), height: 3)
                     }
                 }
@@ -77,7 +78,7 @@ struct ExerciseCardView: View {
                 if step.isFirstInSection {
                     Text("// \(step.sectionName.uppercased())")
                         .terminalFont(13)
-                        .foregroundColor(TN.purple)
+                        .foregroundColor(theme.purple)
                         .padding(.bottom, 8)
                 }
 
@@ -85,45 +86,45 @@ struct ExerciseCardView: View {
                 VStack(spacing: 16) {
                     Text(step.exercise.name.uppercased())
                         .terminalFont(22, weight: .bold)
-                        .foregroundColor(TN.fg)
+                        .foregroundColor(theme.fg)
                         .multilineTextAlignment(.center)
 
                     HStack(spacing: 24) {
                         VStack(spacing: 4) {
                             Text("SET")
                                 .terminalFont(11)
-                                .foregroundColor(TN.comment)
+                                .foregroundColor(theme.comment)
                             Text("\(step.setNumber) of \(step.exercise.sets)")
                                 .terminalFont(18, weight: .bold)
-                                .foregroundColor(TN.blue)
+                                .foregroundColor(theme.blue)
                         }
 
                         Rectangle()
-                            .fill(TN.comment.opacity(0.3))
+                            .fill(theme.comment.opacity(0.3))
                             .frame(width: 1, height: 30)
 
                         VStack(spacing: 4) {
                             Text("REPS")
                                 .terminalFont(11)
-                                .foregroundColor(TN.comment)
+                                .foregroundColor(theme.comment)
                             Text("\(step.exercise.reps)")
                                 .terminalFont(18, weight: .bold)
-                                .foregroundColor(TN.green)
+                                .foregroundColor(theme.green)
                         }
                     }
 
                     if step.exercise.perSide {
                         Text("↔ EACH SIDE")
                             .terminalFont(12, weight: .bold)
-                            .foregroundColor(TN.orange)
+                            .foregroundColor(theme.orange)
                     }
 
                     if !step.exercise.notes.isEmpty {
                         Divider()
-                            .background(TN.comment.opacity(0.3))
+                            .background(theme.comment.opacity(0.3))
                         Text(step.exercise.notes)
                             .terminalFont(13)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -139,7 +140,7 @@ struct ExerciseCardView: View {
                 VStack(spacing: 12) {
                     Text("rate this set")
                         .terminalFont(12)
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
 
                     HStack(spacing: 12) {
                         ForEach(SetRating.allCases, id: \.self) { rating in
@@ -161,7 +162,7 @@ struct ExerciseCardView: View {
                 HStack(spacing: 4) {
                     Text("← swipe left to complete")
                         .terminalFont(12)
-                        .foregroundColor(TN.comment.opacity(0.5))
+                        .foregroundColor(theme.comment.opacity(0.5))
                 }
                 .padding(.bottom, 16)
             }
@@ -193,9 +194,9 @@ struct ExerciseCardView: View {
 
     private func ratingColor(_ rating: SetRating) -> Color {
         switch rating {
-        case .couldNotComplete: return TN.red
-        case .good: return TN.green
-        case .tooEasy: return TN.yellow
+        case .couldNotComplete: return theme.red
+        case .good: return theme.green
+        case .tooEasy: return theme.yellow
         }
     }
 }

@@ -16,12 +16,13 @@ extension View {
 }
 
 struct TerminalButtonStyle: ButtonStyle {
+    @Environment(\.theme) private var theme
     let color: Color
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .terminalFont(14, weight: .bold)
-            .foregroundColor(configuration.isPressed ? TN.bg : color)
+            .foregroundColor(configuration.isPressed ? theme.bg : color)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(
@@ -36,15 +37,17 @@ struct TerminalButtonStyle: ButtonStyle {
 }
 
 struct TerminalCardModifier: ViewModifier {
+    @Environment(\.theme) private var theme
+
     func body(content: Content) -> some View {
         content
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(TN.card)
+                    .fill(theme.card)
                     .overlay(
                         RoundedRectangle(cornerRadius: 6)
-                            .stroke(TN.comment.opacity(0.3), lineWidth: 1)
+                            .stroke(theme.comment.opacity(0.3), lineWidth: 1)
                     )
             )
     }

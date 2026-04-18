@@ -1,32 +1,34 @@
 import SwiftUI
 
 struct RoutineOverviewSheet: View {
+    @Environment(\.theme) private var theme
     let session: WorkoutSession
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
-            TN.bg.ignoresSafeArea()
+            theme.bg.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
                 HStack {
                     Text("// ROUTINE OVERVIEW")
                         .terminalFont(14, weight: .bold)
-                        .foregroundColor(TN.purple)
+                        .foregroundColor(theme.purple)
                     Spacer()
+                    PhaseChip(phase: session.routine.currentPhase)
                     Button {
                         dismiss()
                     } label: {
                         Text("[ ✕ ]")
                             .terminalFont(14, weight: .bold)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                     }
                 }
                 .padding()
 
                 Divider()
-                    .background(TN.comment.opacity(0.3))
+                    .background(theme.comment.opacity(0.3))
 
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
@@ -40,7 +42,7 @@ struct RoutineOverviewSheet: View {
                                 let _ = (lastSection = step.sectionName)
                                 Text("// \(step.sectionName.uppercased())")
                                     .terminalFont(12, weight: .bold)
-                                    .foregroundColor(TN.purple)
+                                    .foregroundColor(theme.purple)
                                     .padding(.horizontal)
                                     .padding(.top, 16)
                                     .padding(.bottom, 4)
@@ -62,7 +64,24 @@ struct RoutineOverviewSheet: View {
     }
 }
 
+struct PhaseChip: View {
+    let phase: WorkoutPhase
+
+    var body: some View {
+        Text(phase.displayName.uppercased())
+            .terminalFont(10, weight: .bold)
+            .foregroundColor(Theme.base.bg) // fixed dark text for contrast on saturated accent pill
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(phase.accentColor)
+            )
+    }
+}
+
 struct OverviewStepRow: View {
+    @Environment(\.theme) private var theme
     let step: WorkoutStep
     let index: Int
     let currentIndex: Int
@@ -75,12 +94,12 @@ struct OverviewStepRow: View {
             // Status indicator
             if isCompleted {
                 Image(systemName: "checkmark")
-                    .foregroundColor(TN.green.opacity(0.5))
+                    .foregroundColor(theme.green.opacity(0.5))
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .frame(width: 20)
             } else if isCurrent {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(TN.blue)
+                    .foregroundColor(theme.blue)
                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                     .frame(width: 20)
             } else {
@@ -90,20 +109,20 @@ struct OverviewStepRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(step.exercise.name)
                     .terminalFont(13, weight: isCurrent ? .bold : .regular)
-                    .foregroundColor(isCompleted ? TN.comment.opacity(0.5) : (isCurrent ? TN.fg : TN.fg))
+                    .foregroundColor(isCompleted ? theme.comment.opacity(0.5) : (isCurrent ? theme.fg : theme.fg))
                     .strikethrough(isCompleted)
 
                 HStack(spacing: 8) {
                     Text("Set \(step.setNumber)/\(step.exercise.sets)")
                         .terminalFont(11)
-                        .foregroundColor(isCompleted ? TN.comment.opacity(0.3) : TN.comment)
+                        .foregroundColor(isCompleted ? theme.comment.opacity(0.3) : theme.comment)
                     Text(step.exercise.isTimed ? "⏱ \(step.exercise.workDisplayValue)s" : "× \(step.exercise.reps) reps")
                         .terminalFont(11)
-                        .foregroundColor(isCompleted ? TN.comment.opacity(0.3) : TN.comment)
+                        .foregroundColor(isCompleted ? theme.comment.opacity(0.3) : theme.comment)
                     if step.exercise.perSide {
                         Text("↔")
                             .terminalFont(11)
-                            .foregroundColor(isCompleted ? TN.orange.opacity(0.3) : TN.orange)
+                            .foregroundColor(isCompleted ? theme.orange.opacity(0.3) : theme.orange)
                     }
                 }
             }
@@ -112,6 +131,6 @@ struct OverviewStepRow: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .background(isCurrent ? TN.card : Color.clear)
+        .background(isCurrent ? theme.card : Color.clear)
     }
 }

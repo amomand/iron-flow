@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct RestTimerView: View {
+    @Environment(\.theme) private var theme
     let seconds: Int
     let remaining: Int
     let nextExerciseName: String
@@ -15,13 +16,13 @@ struct RestTimerView: View {
                 Spacer()
                 Text("~\(estimatedMinutes) min left")
                     .terminalFont(12)
-                    .foregroundColor(TN.comment)
+                    .foregroundColor(theme.comment)
                 Spacer()
                 Button {
                     onShowOverview()
                 } label: {
                     Image(systemName: "list.bullet")
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                 }
             }
@@ -32,23 +33,23 @@ struct RestTimerView: View {
 
             Text("// REST")
                 .terminalFont(14)
-                .foregroundColor(TN.purple)
+                .foregroundColor(theme.purple)
 
             Text(timeString)
                 .terminalFont(72, weight: .bold)
-                .foregroundColor(remaining <= 5 ? TN.red : TN.blue)
-                .shadow(color: (remaining <= 5 ? TN.red : TN.blue).opacity(0.4), radius: 20)
+                .foregroundColor(remaining <= 5 ? theme.red : theme.blue)
+                .shadow(color: (remaining <= 5 ? theme.red : theme.blue).opacity(0.4), radius: 20)
                 .contentTransition(.numericText())
                 .animation(.linear(duration: 0.1), value: remaining)
 
             // Progress ring
             ZStack {
                 Circle()
-                    .stroke(TN.darkCard, lineWidth: 4)
+                    .stroke(theme.darkCard, lineWidth: 4)
                     .frame(width: 120, height: 120)
                 Circle()
                     .trim(from: 0, to: seconds > 0 ? CGFloat(remaining) / CGFloat(seconds) : 0)
-                    .stroke(remaining <= 5 ? TN.red : TN.blue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .stroke(remaining <= 5 ? theme.red : theme.blue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                     .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 1), value: remaining)
@@ -56,7 +57,7 @@ struct RestTimerView: View {
 
             Text("next: \(nextExerciseName)")
                 .terminalFont(13)
-                .foregroundColor(TN.comment)
+                .foregroundColor(theme.comment)
 
             Spacer()
 
@@ -65,7 +66,7 @@ struct RestTimerView: View {
             } label: {
                 Text("[ SKIP ▸ ]")
             }
-            .buttonStyle(TerminalButtonStyle(color: TN.comment))
+            .buttonStyle(TerminalButtonStyle(color: theme.comment))
             .padding(.bottom, 40)
         }
     }
@@ -78,6 +79,7 @@ struct RestTimerView: View {
 }
 
 struct TimedExerciseView: View {
+    @Environment(\.theme) private var theme
     let step: WorkoutStep
     let totalSteps: Int
     let currentIndex: Int
@@ -97,14 +99,14 @@ struct TimedExerciseView: View {
                 } label: {
                     Text("[ ✕ ]")
                         .terminalFont(14, weight: .bold)
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
                 }
 
                 Spacer()
 
                 Text("~\(estimatedMinutes) min left")
                     .terminalFont(12)
-                    .foregroundColor(TN.comment)
+                    .foregroundColor(theme.comment)
 
                 Spacer()
 
@@ -113,13 +115,13 @@ struct TimedExerciseView: View {
                         onShowOverview()
                     } label: {
                         Image(systemName: "list.bullet")
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                             .font(.system(size: 14, weight: .bold, design: .monospaced))
                     }
 
                     Text("\(currentIndex + 1)/\(totalSteps)")
                         .terminalFont(13)
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
                 }
             }
             .padding(.horizontal)
@@ -128,10 +130,10 @@ struct TimedExerciseView: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Rectangle()
-                        .fill(TN.darkCard)
+                        .fill(theme.darkCard)
                         .frame(height: 3)
                     Rectangle()
-                        .fill(TN.green)
+                        .fill(theme.green)
                         .frame(width: geo.size.width * Double(currentIndex) / Double(max(totalSteps, 1)), height: 3)
                 }
             }
@@ -144,47 +146,47 @@ struct TimedExerciseView: View {
             if step.isFirstInSection {
                 Text("// \(step.sectionName.uppercased())")
                     .terminalFont(13)
-                    .foregroundColor(TN.purple)
+                    .foregroundColor(theme.purple)
                     .padding(.bottom, 8)
             }
 
             VStack(spacing: 20) {
                 Text(step.exercise.name.uppercased())
                     .terminalFont(22, weight: .bold)
-                    .foregroundColor(TN.fg)
+                    .foregroundColor(theme.fg)
                     .multilineTextAlignment(.center)
 
                 HStack(spacing: 24) {
                     VStack(spacing: 4) {
                         Text("SET")
                             .terminalFont(11)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                         Text("\(step.setNumber) of \(step.exercise.sets)")
                             .terminalFont(18, weight: .bold)
-                            .foregroundColor(TN.blue)
+                            .foregroundColor(theme.blue)
                     }
 
                     Rectangle()
-                        .fill(TN.comment.opacity(0.3))
+                        .fill(theme.comment.opacity(0.3))
                         .frame(width: 1, height: 30)
 
                     VStack(spacing: 4) {
                         Text("TIME")
                             .terminalFont(11)
-                            .foregroundColor(TN.comment)
+                            .foregroundColor(theme.comment)
                         Text(timeString)
                             .terminalFont(18, weight: .bold)
-                            .foregroundColor(remaining <= 5 ? TN.red : TN.green)
+                            .foregroundColor(remaining <= 5 ? theme.red : theme.green)
                     }
                 }
 
                 ZStack {
                     Circle()
-                        .stroke(TN.darkCard, lineWidth: 4)
+                        .stroke(theme.darkCard, lineWidth: 4)
                         .frame(width: 120, height: 120)
                     Circle()
                         .trim(from: 0, to: seconds > 0 ? CGFloat(remaining) / CGFloat(seconds) : 0)
-                        .stroke(remaining <= 5 ? TN.red : TN.green, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                        .stroke(remaining <= 5 ? theme.red : theme.green, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                         .frame(width: 120, height: 120)
                         .rotationEffect(.degrees(-90))
                         .animation(.linear(duration: 0.5), value: remaining)
@@ -192,20 +194,20 @@ struct TimedExerciseView: View {
 
                 Text("next: \(nextLabel)")
                     .terminalFont(13)
-                    .foregroundColor(TN.comment)
+                    .foregroundColor(theme.comment)
 
                 if step.exercise.perSide {
                     Text("↔ EACH SIDE")
                         .terminalFont(12, weight: .bold)
-                        .foregroundColor(TN.orange)
+                        .foregroundColor(theme.orange)
                 }
 
                 if !step.exercise.notes.isEmpty {
                     Divider()
-                        .background(TN.comment.opacity(0.3))
+                        .background(theme.comment.opacity(0.3))
                     Text(step.exercise.notes)
                         .terminalFont(13)
-                        .foregroundColor(TN.comment)
+                        .foregroundColor(theme.comment)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -218,7 +220,7 @@ struct TimedExerciseView: View {
 
             Text("auto-advances at zero")
                 .terminalFont(12)
-                .foregroundColor(TN.comment.opacity(0.5))
+                .foregroundColor(theme.comment.opacity(0.5))
                 .padding(.bottom, 12)
 
             Button {
@@ -226,7 +228,7 @@ struct TimedExerciseView: View {
             } label: {
                 Text("[ SKIP ▸ ]")
             }
-            .buttonStyle(TerminalButtonStyle(color: TN.comment))
+            .buttonStyle(TerminalButtonStyle(color: theme.comment))
             .padding(.bottom, 40)
         }
     }
