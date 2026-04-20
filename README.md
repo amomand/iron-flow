@@ -18,8 +18,10 @@ It replaces checking training notes mid-workout with a low-friction interface fo
 
 ## Features
 
-- **Routine editor**: create and edit routines, sections, exercises, sets, reps, timed durations, rest periods, notes, and per-side exercises.
-- **JSON import/export**: export routines to the clipboard and import routine JSON generated elsewhere, including from an LLM.
+- **Phase system (Base / Peak / Deload)**: each routine runs in one of three phases. Per-exercise overrides adjust sets, reps, or timed durations — unchanged fields inherit from Base. Switching phases updates the on-screen set count immediately, and the workout subtree re-themes to match.
+- **Phase-driven theming**: Base uses TokyoNight Night, Peak uses Storm with red accents, Deload uses TokyoNight Day. Theming is scoped to the in-session workout UI so the home screen phase pills stay readable on every row.
+- **Routine editor**: create and edit routines, sections, exercises, sets, reps, timed durations, rest periods, notes, per-side exercises, and per-phase overrides.
+- **JSON import/export**: export routines to the clipboard and import routine JSON generated elsewhere, including from an LLM. Phase overrides round-trip cleanly; older routines without phase data decode unchanged.
 - **Split rest timers**: configure separate rest durations between sets and after the final set of an exercise.
 - **Timed exercise support**: use `durationSeconds` for holds or other time-based movements.
 - **Automatic progression**: at workout completion, exercises with enough Fail ratings are reduced, and exercises with enough Easy ratings are progressed.
@@ -34,6 +36,7 @@ Routines are stored as JSON in the app documents directory:
 ```text
 Routine
 ├── name
+├── currentPhase            # .base | .peak | .deload
 └── sections
     ├── name
     └── exercises
@@ -44,10 +47,11 @@ Routine
         ├── restBetweenSetsSeconds
         ├── restAfterExerciseSeconds
         ├── notes
-        └── perSide
+        ├── perSide
+        └── phaseOverrides   # optional Peak / Deload overrides for sets, reps, durationSeconds
 ```
 
-During a workout, `Routine.buildSteps()` flattens the routine into one `WorkoutStep` per set. `WorkoutSession` tracks the current step, ratings, timers, results, summary output, and computed adjustments. Workout sessions are currently in-memory only; historical workout logs are not persisted.
+During a workout, `Routine.buildSteps()` resolves each exercise against the routine's `currentPhase` and flattens into one `WorkoutStep` per set, so downstream views stay phase-agnostic. `WorkoutSession` tracks the current step, ratings, timers, results, summary output, and computed adjustments. Workout sessions are currently in-memory only; historical workout logs are not persisted.
 
 ## Tech
 
@@ -63,7 +67,8 @@ During a workout, `Routine.buildSteps()` flattens the routine into one `WorkoutS
 IronFlow/
 ├── IronFlowApp.swift                  # App entry point
 ├── Theme/
-│   ├── TokyoNightColors.swift         # TN.bg, TN.blue, TN.red, etc.
+│   ├── TokyoNightColors.swift         # TN.bg, TN.blue, TN.red, etc. (base palette)
+│   ├── Theme.swift                    # Phase-driven palettes + @Environment(\.theme) injection
 │   └── TerminalStyle.swift            # Shared fonts, button styles, card modifier
 ├── Models/
 │   ├── Routine.swift                  # Routine -> Section -> ExerciseBlock
