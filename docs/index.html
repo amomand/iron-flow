@@ -412,23 +412,23 @@
 <header class="hero">
   <div>
     <div class="eyebrow mono">
-      <span class="tag">// swiftui</span> &nbsp; iOS 17+ &nbsp; • &nbsp; side-loaded &nbsp; • &nbsp; obsidian-friendly
+      <span class="tag">// total addressable market: 1</span> &nbsp; • &nbsp; side-loaded &nbsp; • &nbsp; not on the app store
     </div>
     <h1>
       Lift like it's<br/>
       a <span class="accent">terminal session.</span>
     </h1>
     <p class="lede">
-      IronFlow is a personal workout timer for the kind of lifter who takes notes in Obsidian and
-      pins their training plan to a markdown file. Routine-driven, low-friction, and styled like
-      your favourite colour scheme — because why shouldn't it be?
+      Who wants to manage their workouts in JSON, with an AI loop to seed the base routines, and a
+      TokyoNight colour scheme glowing at them between sets? <em>This guy.</em> Possibly no-one
+      else, ever. IronFlow is a workout timer carefully tailored to a market of one.
     </p>
     <div class="ctas">
       <a href="https://github.com/amomand/iron-flow" class="btn btn-primary mono">
-        <span class="bracket">&lt;</span> view on github <span class="bracket">/&gt;</span>
+        <span class="bracket">&lt;</span> view the source <span class="bracket">/&gt;</span>
       </a>
       <a href="#features" class="btn btn-ghost mono">
-        <span class="bracket">#</span> see features
+        <span class="bracket">#</span> see what it does
       </a>
     </div>
   </div>
@@ -456,37 +456,37 @@
 
 <section id="features">
   <div class="section-label mono"><span class="hash">##</span> features</div>
-  <h2>Built for the set <span class="accent">you're actually in.</span></h2>
+  <h2>Things it does, <span class="accent">for the one guy.</span></h2>
   <div class="features">
     <div class="card accent-purple">
       <div class="icon mono">// card-ui</div>
       <h3>One card, one set</h3>
-      <p>Each set is a focused card: exercise, reps or duration, per-side flag, and notes. No scrolling mid-lift.</p>
+      <p>Each set is a focused card: exercise, reps, per-side flag, notes. No scrolling mid-lift. Any issues with this, keep them to yourself.</p>
     </div>
     <div class="card accent-orange">
       <div class="icon mono">// timers</div>
       <h3>Split rest timers</h3>
-      <p>Separate rest between sets and after the final set. Progress ring, skip control, haptic at zero.</p>
+      <p>Separate rest between sets and after the final set of an exercise. A progress ring. A buzz at zero. Pretty standard timer stuff, honestly.</p>
     </div>
     <div class="card accent-green">
       <div class="icon mono">// ratings</div>
       <h3>Fail / Good / Easy</h3>
-      <p>Rate each set in one tap. Enough Easies progress you; enough Fails pull the weight back.</p>
+      <p>Rate each set in one tap. Enough Easies progress the exercise; enough Fails pull it back. The algorithm is vibes-based but it's my vibes.</p>
     </div>
     <div class="card accent-yellow">
       <div class="icon mono">// summary</div>
       <h3>Obsidian-shaped output</h3>
-      <p>End-of-workout markdown summary copies to the clipboard. All-good days stay short; exceptions stand out.</p>
+      <p>End-of-workout markdown summary, copied to the clipboard, ready to paste into a training log that also nobody else reads.</p>
     </div>
     <div class="card accent-red">
-      <div class="icon mono">// json</div>
-      <h3>JSON in, JSON out</h3>
-      <p>Import routines straight from an LLM-generated JSON blob. Export anything you've built in the editor.</p>
+      <div class="icon mono">// json + ai</div>
+      <h3>Routines as JSON</h3>
+      <p>Draft a routine with an LLM, paste the JSON, import it. Export what you've built. Normal people use apps. We use JSON.</p>
     </div>
     <div class="card">
       <div class="icon mono">// theme</div>
-      <h3>TokyoNight, always</h3>
-      <p>Monospaced type, bracketed controls, comment-style headers. It looks like a coding session because it is one.</p>
+      <h3>TokyoNight, obviously</h3>
+      <p>Monospaced type, bracketed controls, comment-style headers. The gym is a coding session. The coding session is a gym. It's fine.</p>
     </div>
   </div>
 </section>
@@ -498,22 +498,22 @@
     <div class="flow-step">
       <div class="num">01</div>
       <h4>Pick a routine</h4>
-      <p>Starter routines seed on first launch. Edit freely or paste JSON.</p>
+      <p>Starter routines seeded from a training plan I asked an LLM about. Edit them, or don't.</p>
     </div>
     <div class="flow-step">
       <div class="num">02</div>
       <h4>Work the sets</h4>
-      <p>Swipe to complete reps. Timed exercises auto-advance at zero.</p>
+      <p>Swipe to complete reps. Timed exercises auto-advance at zero. Your thumb knows what to do.</p>
     </div>
     <div class="flow-step">
       <div class="num">03</div>
       <h4>Rest, then repeat</h4>
-      <p>Countdown ring, next-up label, vibration when the timer ends.</p>
+      <p>Ring counts down. Phone buzzes. Next exercise appears. You, hopefully, lift again.</p>
     </div>
     <div class="flow-step">
       <div class="num">04</div>
       <h4>Copy the summary</h4>
-      <p>Markdown summary with adjustments and flags, ready for your log.</p>
+      <p>Markdown to clipboard. Paste into Obsidian. Close the vault. Go eat.</p>
     </div>
   </div>
 </section>
@@ -524,11 +524,12 @@
       <div class="section-label mono"><span class="hash">##</span> data</div>
       <h2>Routines are just <span class="accent">JSON.</span></h2>
       <p>
-        No backend, no account, no lock-in. Routines live as JSON in the app's documents directory.
-        Build them in the editor, export to your notes, or have an LLM draft one and paste it in.
+        No backend. No account. No lock-in, because there is nothing to be locked into.
+        Routines live as JSON in the app's documents directory. Build them in the editor, export
+        them to a note, or paste in whatever an LLM hands you and see what happens.
       </p>
       <p class="comment mono" style="margin-top:1.5rem; font-size:0.85rem;">
-        // backward-compatible decoding handles older fields and legacy rest values.
+        // if the schema changes, I'll know, because it's me.
       </p>
     </div>
     <pre class="code"><span class="c">// Routine.json</span>
@@ -551,11 +552,13 @@
 
 <footer>
   <div>
-    <span class="comment">// built with swiftui · iOS 17+ · side-loaded via xcode</span>
+    <span class="comment">// not on the app store · not coming to the app store · please do not ask</span>
   </div>
   <div style="margin-top: 0.6rem;">
     <span class="accent">IronFlow</span> &nbsp;·&nbsp;
     <a href="https://github.com/amomand/iron-flow">github.com/amomand/iron-flow</a>
+    &nbsp;·&nbsp;
+    <span class="comment">a market of one</span>
   </div>
 </footer>
 
