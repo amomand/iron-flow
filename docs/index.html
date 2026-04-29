@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IronFlow — a terminal-flavoured workout timer</title>
+<meta name="description" content="IronFlow is a personal iOS workout timer built in SwiftUI. TokyoNight theme, monospaced UI, routine-driven, Obsidian-friendly summaries." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #1a1b26;
+    --card:      #24283b;
+    --dark-card: #1f2335;
+    --fg:        #c0caf5;
+    --comment:   #565f89;
+    --blue:      #7aa2f7;
+    --green:     #9ece6a;
+    --yellow:    #e0af68;
+    --red:       #f7768e;
+    --purple:    #bb9af7;
+    --orange:    #ff9e64;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { color: var(--purple); }
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input[type="button"]:focus-visible,
+  input[type="submit"]:focus-visible,
+  input[type="reset"]:focus-visible {
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(224, 175, 104, 0.18);
+    border-radius: 4px;
+  }
+  a:focus-visible {
+    color: var(--purple);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .comment { color: var(--comment); }
+
+  /* Ambient glow backdrop */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(800px 500px at 15% 10%, rgba(122,162,247,0.18), transparent 60%),
+      radial-gradient(700px 500px at 85% 30%, rgba(187,154,247,0.16), transparent 60%),
+      radial-gradient(900px 600px at 50% 90%, rgba(255,158,100,0.10), transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  main, header, footer { position: relative; z-index: 1; }
+
+  /* ========== NAV ========== */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  nav .brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+  nav .brand .bracket { color: var(--comment); }
+  nav .brand .name {
+    background: linear-gradient(90deg, var(--blue), var(--purple), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  nav .links { display: flex; gap: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+  nav .links a { color: var(--comment); }
+  nav .links a:hover { color: var(--fg); }
+
+  /* ========== HERO ========== */
+  .hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .hero .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--comment);
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+  .hero .eyebrow .tag { color: var(--green); }
+  .hero h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.05;
+    margin: 0 0 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 55%, var(--orange) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.lede {
+    font-size: 1.15rem;
+    color: var(--fg);
+    opacity: 0.85;
+    max-width: 34rem;
+    margin: 0 0 2rem;
+  }
+  .hero .ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.85rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    border: 1px solid transparent;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: var(--bg);
+    box-shadow: 0 0 0 1px rgba(122,162,247,0.4), 0 10px 30px -10px rgba(122,162,247,0.6);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px rgba(187,154,247,0.6), 0 20px 40px -10px rgba(187,154,247,0.7);
+    color: var(--bg);
+  }
+  .btn-ghost {
+    border-color: var(--comment);
+    color: var(--fg);
+  }
+  .btn-ghost:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+  .btn .bracket { color: var(--comment); }
+  .btn-primary .bracket { color: rgba(26,27,38,0.5); }
+
+  /* Phone mockup */
+  .phone-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+  }
+  .phone {
+    width: 320px;
+    height: 660px;
+    background: var(--dark-card);
+    border-radius: 44px;
+    padding: 14px;
+    border: 1px solid rgba(122,162,247,0.25);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.4) inset,
+      0 30px 80px -20px rgba(122,162,247,0.35),
+      0 50px 120px -30px rgba(187,154,247,0.35);
+    transform: rotate3d(1, -0.4, 0.05, 8deg);
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+  .phone:hover { transform: rotate3d(1, -0.2, 0.05, 2deg) translateY(-6px); }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 32px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    padding: 1.2rem 1rem;
+    color: var(--fg);
+    position: relative;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 26px;
+    background: #000;
+    border-radius: 14px;
+    z-index: 2;
+  }
+  .phone-status {
+    color: var(--comment);
+    font-size: 0.7rem;
+    margin-bottom: 1.8rem;
+  }
+  .phone-title { color: var(--comment); font-size: 0.75rem; margin-bottom: 0.4rem; }
+  .phone-exercise {
+    color: var(--fg);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .phone-sub { color: var(--comment); font-size: 0.8rem; margin-bottom: 1.3rem; }
+  .phone-bigset {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--blue);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .phone-bigset .unit { color: var(--comment); font-size: 1rem; font-weight: 400; margin-left: 0.4rem; }
+  .phone-setrow { color: var(--comment); font-size: 0.8rem; margin-top: 0.4rem; margin-bottom: 1.8rem; }
+  .phone-ratings { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .phone-rating {
+    flex: 1; padding: 0.6rem 0;
+    border: 1px solid var(--comment);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+  .phone-rating.fail { color: var(--red); border-color: rgba(247,118,142,0.4); }
+  .phone-rating.good { color: var(--bg); background: var(--green); border-color: var(--green); font-weight: 700; }
+  .phone-rating.easy { color: var(--yellow); border-color: rgba(224,175,104,0.4); }
+  .phone-hint { color: var(--comment); font-size: 0.72rem; text-align: center; margin-top: auto; }
+  .phone-hint .arrow { color: var(--purple); }
+  .ring-row {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem 0 1rem;
+  }
+  .ring {
+    width: 110px; height: 110px;
+    position: relative;
+  }
+
+  /* ========== SECTION SHARED ========== */
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--comment);
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .section-label .hash { color: var(--purple); }
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+    margin: 0 0 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h2 .accent { color: var(--orange); }
+
+  /* ========== FEATURES ========== */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .card {
+    background: linear-gradient(180deg, var(--card), var(--dark-card));
+    border: 1px solid rgba(122,162,247,0.15);
+    border-radius: 14px;
+    padding: 1.6rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(187,154,247,0.45);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    opacity: 0.5;
+  }
+  .card .icon {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--blue);
+    font-size: 0.85rem;
+    margin-bottom: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+  .card h3 {
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    color: var(--fg);
+  }
+  .card p { margin: 0; color: var(--fg); opacity: 0.75; font-size: 0.92rem; }
+  .card.accent-purple .icon { color: var(--purple); }
+  .card.accent-orange .icon { color: var(--orange); }
+  .card.accent-green  .icon { color: var(--green); }
+  .card.accent-yellow .icon { color: var(--yellow); }
+  .card.accent-red    .icon { color: var(--red); }
+
+  /* ========== FLOW DIAGRAM ========== */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .flow-step {
+    background: var(--card);
+    border: 1px solid rgba(122,162,247,0.2);
+    border-radius: 12px;
+    padding: 1.3rem;
+    position: relative;
+  }
+  .flow-step .num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--purple);
+    font-size: 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+  .flow-step h4 {
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+  }
+  .flow-step p {
+    margin: 0; color: var(--fg); opacity: 0.7; font-size: 0.85rem;
+  }
+
+  /* ========== CODE SAMPLE ========== */
+  .code-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .code-row h2 { margin-bottom: 1rem; }
+  .code-row p { color: var(--fg); opacity: 0.8; font-size: 1rem; }
+  pre.code {
+    background: var(--dark-card);
+    border: 1px solid rgba(122,162,247,0.2);
+    border-radius: 12px;
+    padding: 1.4rem 1.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.7);
+  }
+  pre.code .k { color: var(--purple); }
+  pre.code .s { color: var(--green); }
+  pre.code .n { color: var(--orange); }
+  pre.code .c { color: var(--comment); }
+  pre.code .t { color: var(--blue); }
+
+  /* ========== FOOTER ========== */
+  footer {
+    border-top: 1px solid rgba(86,95,137,0.3);
+    margin-top: 3rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: var(--comment);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+  footer .accent { color: var(--orange); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 2rem; }
+    .phone-wrap { order: -1; }
+    .phone { transform: none; }
+    .features { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr 1fr; }
+    .code-row { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+  @media (max-width: 500px) {
+    .flow { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand mono">
+    <span class="bracket">[</span><span class="name">IronFlow</span><span class="bracket">]</span>
+  </div>
+  <div class="links">
+    <a href="#features">features</a>
+    <a href="#flow">flow</a>
+    <a href="#data">data</a>
+    <a href="https://github.com/amomand/iron-flow">github</a>
+  </div>
+</nav>
+
+<main>
+<header class="hero">
+  <div>
+    <div class="eyebrow mono">
+      <span class="tag">// total addressable market: 1</span> &nbsp; • &nbsp; side-loaded &nbsp; • &nbsp; not on the app store
+    </div>
+    <h1>
+      Lift like it's<br/>
+      a <span class="accent">terminal session.</span>
+    </h1>
+    <p class="lede">
+      Who wants to manage their workouts in JSON, with an AI loop to seed the base routines, and a
+      TokyoNight colour scheme glowing at them between sets? <em>This guy.</em> Possibly no-one
+      else, ever. IronFlow is a workout timer carefully tailored to a market of one.
+    </p>
+    <div class="ctas">
+      <a href="https://github.com/amomand/iron-flow" class="btn btn-primary mono">
+        <span class="bracket">&lt;</span> view the source <span class="bracket">/&gt;</span>
+      </a>
+      <a href="#features" class="btn btn-ghost mono">
+        <span class="bracket">#</span> see what it does
+      </a>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-status">// 09:42 · push · set 2/4</div>
+        <div class="phone-title"># push day · chest &amp; shoulders</div>
+        <div class="phone-exercise">Incline Press</div>
+        <div class="phone-sub">set 2 of 4 · ~60s rest</div>
+        <div class="phone-bigset">8<span class="unit">reps</span></div>
+        <div class="phone-setrow">[ ●●○○ ] &nbsp; 2 done &nbsp; 2 left</div>
+        <div class="phone-ratings">
+          <div class="phone-rating fail">[ fail ]</div>
+          <div class="phone-rating good">[ good ]</div>
+          <div class="phone-rating easy">[ easy ]</div>
+        </div>
+        <div class="phone-hint">swipe left <span class="arrow">→</span> complete set</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="section-label mono"><span class="hash">##</span> features</div>
+  <h2>Things it does, <span class="accent">for the one guy.</span></h2>
+  <div class="features">
+    <div class="card accent-purple">
+      <div class="icon mono">// card-ui</div>
+      <h3>One card, one set</h3>
+      <p>Each set is a focused card: exercise, reps, per-side flag, notes. No scrolling mid-lift. Any issues with this, keep them to yourself.</p>
+    </div>
+    <div class="card accent-orange">
+      <div class="icon mono">// timers</div>
+      <h3>Split rest timers</h3>
+      <p>Separate rest between sets and after the final set of an exercise. A progress ring. A buzz at zero. Pretty standard timer stuff, honestly.</p>
+    </div>
+    <div class="card accent-green">
+      <div class="icon mono">// ratings</div>
+      <h3>Fail / Good / Easy</h3>
+      <p>Rate each set in one tap. Enough Easies progress the exercise; enough Fails pull it back. The algorithm is vibes-based but it's my vibes.</p>
+    </div>
+    <div class="card accent-yellow">
+      <div class="icon mono">// summary</div>
+      <h3>Obsidian-shaped output</h3>
+      <p>End-of-workout markdown summary, copied to the clipboard, ready to paste into a training log that also nobody else reads.</p>
+    </div>
+    <div class="card accent-red">
+      <div class="icon mono">// json + ai</div>
+      <h3>Routines as JSON</h3>
+      <p>Draft a routine with an LLM, paste the JSON, import it. Export what you've built. Normal people use apps. We use JSON.</p>
+    </div>
+    <div class="card">
+      <div class="icon mono">// theme</div>
+      <h3>TokyoNight, obviously</h3>
+      <p>Monospaced type, bracketed controls, comment-style headers. The gym is a coding session. The coding session is a gym. It's fine.</p>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="section-label mono"><span class="hash">##</span> flow</div>
+  <h2>From home screen to <span class="accent">clipboard markdown.</span></h2>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="num">01</div>
+      <h4>Pick a routine</h4>
+      <p>Starter routines seeded from a training plan I asked an LLM about. Edit them, or don't.</p>
+    </div>
+    <div class="flow-step">
+      <div class="num">02</div>
+      <h4>Work the sets</h4>
+      <p>Swipe to complete reps. Timed exercises auto-advance at zero. Your thumb knows what to do.</p>
+    </div>
+    <div class="flow-step">
+      <div class="num">03</div>
+      <h4>Rest, then repeat</h4>
+      <p>Ring counts down. Phone buzzes. Next exercise appears. You, hopefully, lift again.</p>
+    </div>
+    <div class="flow-step">
+      <div class="num">04</div>
+      <h4>Copy the summary</h4>
+      <p>Markdown to clipboard. Paste into Obsidian. Close the vault. Go eat.</p>
+    </div>
+  </div>
+</section>
+
+<section id="data">
+  <div class="code-row">
+    <div>
+      <div class="section-label mono"><span class="hash">##</span> data</div>
+      <h2>Routines are just <span class="accent">JSON.</span></h2>
+      <p>
+        No backend. No account. No lock-in, because there is nothing to be locked into.
+        Routines live as JSON in the app's documents directory. Build them in the editor, export
+        them to a note, or paste in whatever an LLM hands you and see what happens.
+      </p>
+      <p class="comment mono" style="margin-top:1.5rem; font-size:0.85rem;">
+        // if the schema changes, I'll know, because it's me.
+      </p>
+    </div>
+    <pre class="code"><span class="c">// Routine.json</span>
+<span class="k">{</span>
+  <span class="t">"name"</span><span class="k">:</span> <span class="s">"Push Day"</span>,
+  <span class="t">"sections"</span><span class="k">:</span> [<span class="k">{</span>
+    <span class="t">"name"</span><span class="k">:</span> <span class="s">"Chest &amp; Shoulders"</span>,
+    <span class="t">"exercises"</span><span class="k">:</span> [<span class="k">{</span>
+      <span class="t">"name"</span><span class="k">:</span> <span class="s">"Incline Press"</span>,
+      <span class="t">"sets"</span><span class="k">:</span> <span class="n">4</span>,
+      <span class="t">"reps"</span><span class="k">:</span> <span class="n">8</span>,
+      <span class="t">"restBetweenSetsSeconds"</span><span class="k">:</span> <span class="n">60</span>,
+      <span class="t">"restAfterExerciseSeconds"</span><span class="k">:</span> <span class="n">120</span>,
+      <span class="t">"perSide"</span><span class="k">:</span> <span class="n">false</span>
+    <span class="k">}</span>]
+  <span class="k">}</span>]
+<span class="k">}</span></pre>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div>
+    <span class="comment">// not on the app store · not coming to the app store · please do not ask</span>
+  </div>
+  <div style="margin-top: 0.6rem;">
+    <span class="accent">IronFlow</span> &nbsp;·&nbsp;
+    <a href="https://github.com/amomand/iron-flow">github.com/amomand/iron-flow</a>
+    &nbsp;·&nbsp;
+    <span class="comment">a market of one</span>
+  </div>
+</footer>
+
+</body>
+</html>
