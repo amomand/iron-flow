@@ -130,8 +130,12 @@ class RoutineStore {
             "Lower B — Unilateral and Posterior Chain",
         ]
 
+        guard routines.count == legacyNames.count else {
+            return false
+        }
+
         let routineNames = Set(routines.map(\.name))
-        return !routineNames.isEmpty && routineNames.isSubset(of: legacyNames)
+        return routineNames == legacyNames
     }
 
     private static func lowerMaintenance() -> Routine {

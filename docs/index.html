@@ -37,6 +37,22 @@
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
   a { color: var(--blue); text-decoration: none; }
   a:hover { color: var(--purple); }
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input[type="button"]:focus-visible,
+  input[type="submit"]:focus-visible,
+  input[type="reset"]:focus-visible {
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(224, 175, 104, 0.18);
+    border-radius: 4px;
+  }
+  a:focus-visible {
+    color: var(--purple);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
   .comment { color: var(--comment); }
 
   /* Ambient glow backdrop */
@@ -409,6 +425,7 @@
   </div>
 </nav>
 
+<main>
 <header class="hero">
   <div>
     <div class="eyebrow mono">
@@ -549,6 +566,7 @@
 <span class="k">}</span></pre>
   </div>
 </section>
+</main>
 
 <footer>
   <div>
